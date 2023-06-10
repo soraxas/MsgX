@@ -1,10 +1,7 @@
 #pragma once
 
+namespace msgx
+{
 
-
-
-namespace msgx{
-
-    void add();
+void add();
 }
-

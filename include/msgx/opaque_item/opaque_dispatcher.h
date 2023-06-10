@@ -54,10 +54,7 @@ constexpr auto NdArrayAdoptOrphanDispatcher<msgx::Item>()
     return &msgx::Item::Oneof::Builder::adoptAnyArray;
 };
 
-
 ////////////////////////////////////////////////////////////
 
-
-
-}  // namespace detail
+}  // namespace conversion
 }  // namespace msgx

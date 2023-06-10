@@ -50,6 +50,6 @@ private:
     std::string value_;
 };
 
-}  // namespace details
+}  // namespace conversion
 
 }  // namespace msgx

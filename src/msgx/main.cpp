@@ -56,9 +56,6 @@ void Message::send(zmq::send_flags send_flags)
     //
     //        array_builder.initBuffer(5);
 
-
-
-
     std::function<capnp::Orphanage(void)> getter = [this]() { return msgBuilder_.getOrphanage(); };
 
     auto mappings = OpaqueMapping{getter};
@@ -80,8 +77,6 @@ void Message::send(zmq::send_flags send_flags)
 
     std::initializer_list<float> rsie = {1, 2, 5, 332, 23233};
     ;
-
-
 
     auto vv = msgx::conversion::opaque_item(getter, {10010, 2, 5, 332, 23233, 3223, 92012});
 

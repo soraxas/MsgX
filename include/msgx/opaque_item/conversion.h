@@ -81,8 +81,6 @@ inline OpaqueItemPtr opaque_item(const OrphanageGetter &getter, const std::initi
 {
     SPDLOG_DEBUG("[Conversion] initializer_list with size {}", value.size());
 
-
-
     return std::make_shared<msgx::conversion::OpaqueArray<T>>(getter, value);
 }
 

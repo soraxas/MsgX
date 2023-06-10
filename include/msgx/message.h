@@ -6,9 +6,6 @@ namespace msgx
 {
 class Message
 {
-
-
-
 protected:
     capnp::MallocMessageBuilder msg_builder_;
 };
