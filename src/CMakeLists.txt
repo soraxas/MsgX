@@ -1,2 +1,3 @@
-add_subdirectory(protobuf_msg)
-add_subdirectory(plotmsg)
+
+add_subdirectory(msgx_capnp)
+add_subdirectory(msgx)
