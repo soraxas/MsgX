@@ -2,14 +2,16 @@
 #include <capnp/message.h>
 #include <capnp/serialize-packed.h>
 
+#include "msgx/message.h"
+
 // #include "_impl/core.hpp"
 
 #include <soraxas_toolbox/print_utils.h>
 
-#include "comms/zmq.h"
 #include "message.h"
 #include "msgx.capnp.h"
 #include "msgx/capnp_conversion.h"
+#include "msgx/comms/zmq.h"
 
 namespace msgx
 {
@@ -20,13 +22,13 @@ class Message
 public:
     explicit Message()
     {
-        msgx::NdArray<float>::Builder array_builder = msgBuilder_.initRoot<msgx::NdArray<float>>();
+        msgx::type::NdArray<float>::Builder array_builder = msgBuilder_.initRoot<msgx::type::NdArray<float>>();
 
         auto shapeBuilder =
             msgx::helpers::build_capnp_list<uint>(array_builder.initMultiDimensional().initShape(2), {1, 2});
     }
 
-    //        msgx::NdArray<float>::Builder array_builder = msgBuilder_.initRoot<msgx::NdArray<float>>();
+    //        msgx::type::NdArray<float>::Builder array_builder = msgBuilder_.initRoot<msgx::type::NdArray<float>>();
 
     void send(zmq::send_flags send_flags = zmq::send_flags::dontwait);
 
@@ -34,8 +36,14 @@ public:
     bool already_sent_{false};
 };
 
+std::string operator""_a(const char *str, std::size_t)
+{
+    return std::string{str} + str;
+}
+
 void Message::send(zmq::send_flags send_flags)
 {
+    sxs::println("okok ", "ha"_a);
     if (!already_sent_)
     {
         already_sent_ = true;
@@ -46,25 +54,69 @@ void Message::send(zmq::send_flags send_flags)
                      "This will leads to growing size of capnp message."
                   << std::endl;
     }
-    auto item_builder = msgBuilder_.initRoot<msgx::Item>();
+    auto item_builder = msgBuilder_.initRoot<msgx::type::Item>();
     //        auto array_builder = item_builder.initValue().initFloatArray();
     //
-    ////        msgx::NdArray<float>::Builder array_builder = msgBuilder_.initRoot<msgx::NdArray<float>>();
+    ////        msgx::type::NdArray<float>::Builder array_builder = msgBuilder_.initRoot<msgx::type::NdArray<float>>();
     //
     //        auto shapeBuilder =
     //        msgx::helpers::build_capnp_list<uint>(array_builder.initMultiDimensional().initShape(2), {1, 2});
     //
     //        array_builder.initBuffer(5);
 
+    MessageX msg;
+
+    //    auto builder = msg.root_;
+
+    //    msgx::conversion::opaque_item(builder, "ha");
+    //    msgx::conversion::opaque_item(builder, 'f');
+    //
+    //
+    //    std::vector<int> ars = {1,2};
+    //    msgx::conversion::opaque_item(builder, ars);
+    //    msgx::conversion::opaque_item<float>(builder, {33,4.,2234.3});
+
+    msg = "ha";
+
+    msg = {1, 2, 12};
+
+    ////    auto _mappings = OpaqueMapping{};
+    //    auto _mappings = std::make_shared<OpaqueMapping>();
+    //
+    //    (*_mappings)["q"] = true;
+    //
+    msg["ha"] = "ok";
+    msg["ha"] = msg.Mapping();
+    msg["ha"] = msg.container("haha");
+    //
+    //    auto ha = msg.lolHAHAcontainer();
+
+    auto haha = std::make_shared<msgx::BAHAHACompltelyOpaqueOitem>(msg.get_orphanage_getter());
+
+    msgx::conversion::opaque_item(haha, 1.2);
+
+    msgx::conversion::opaque_item(haha, {2., 2.32, 3., 1., 2.});
+    msgx::conversion::opaque_item(haha, "{2.,2.32,3.,1.,2.}");
+    msgx::conversion::opaque_item(haha, "{2.,2.32,3.,1.,2.}");
+    msgx::conversion::opaque_item(haha, "{2.,2.32,3.,1.,2.}");
+    msgx::conversion::opaque_item(haha, "{2.,2.32,3.,1.,2.}");
+    msgx::conversion::opaque_item(haha, "{2.,2.32,3.,1.,2.}");
+
+    //    msg = 3;
+
+    //    msg["ok"] = ;
+
+    msg = haha;
+
+    //    msg = ha;
+
+    msg.send();
+
+    msg.container("ha");
+
     std::function<capnp::Orphanage(void)> getter = [this]() { return msgBuilder_.getOrphanage(); };
 
     auto mappings = OpaqueMapping{getter};
-
-    mappings["ha"] = false;
-    mappings["ha5"] = false;
-    mappings[true] = false;
-    mappings["ha|^{%N"]["r"][false][true] = true;
-    mappings[true] = nullptr;
 
     //    msgBuilder_.getOrphanage();
 
@@ -73,15 +125,25 @@ void Message::send(zmq::send_flags send_flags)
 
     std::vector<dtype> isren = {1, 2, 5, 332, 2323};
     //
-    mappings["okok"] = isren;
+
+    mappings["true"] = msg.container("isren");
+
+    mappings["okok bye"] = isren;
+    mappings["_"] = isren;
+    mappings["_"] = true;
 
     std::initializer_list<float> rsie = {1, 2, 5, 332, 23233};
     ;
 
-    auto vv = msgx::conversion::opaque_item(getter, {10010, 2, 5, 332, 23233, 3223, 92012});
+    //    msgx::conversion::OpaqueArray<float> a{};
 
-    mappings["rsieokok"] = vv;
-    ;
+    //    auto vv = std::make_shared<msgx::conversion::OpaqueArray<float>>();
+    //    auto vv = msgx::conversion::opaque_item(getter, {10010, 2, 5, 332, 23233, 3223, 92012});
+
+    //    vv->assign({1, 23, 2});
+
+    //    mappings["rsieokok"] = vv;
+    //    ;
 
     mappings.build(item_builder.initOneof());
 
@@ -107,7 +169,7 @@ using namespace sxs;
 void add()
 {
     capnp::MallocMessageBuilder message;
-    msgx::NdArray<float>::Builder array_builder = message.initRoot<msgx::NdArray<float>>();
+    msgx::type::NdArray<float>::Builder array_builder = message.initRoot<msgx::type::NdArray<float>>();
 
     auto shapeBuilder =
         msgx::helpers::build_capnp_list<uint>(array_builder.initMultiDimensional().initShape(2), {1, 2});

@@ -1,6 +1,6 @@
 @0xae43b38254dba6ca;
 using Cxx = import "/capnp/c++.capnp";
-$Cxx.namespace("msgx");
+$Cxx.namespace("msgx::type");
 
 #using Math = import "math.capnp";
 
@@ -60,7 +60,7 @@ struct Item {
         stringArray        @20 :NdArray(List(Text));
         anyArray           @21 :NdArray(List(Item));
 
-        mapping            @22 :Map(Item, Item);
+        mapping            @22 :Map(Text, Item);
     }
 }
 

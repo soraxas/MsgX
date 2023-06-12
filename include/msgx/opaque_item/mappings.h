@@ -11,7 +11,7 @@
 namespace msgx
 {
 
-using OpaqueMappingCapnpType = msgx::Map<msgx::Item, msgx::Item>;
+using OpaqueMappingCapnpType = ::msgx::type::Map<::msgx::type::Item, ::msgx::type::Item>;
 
 class OpaqueMapping : public OpaqueComposedItem<OpaqueMappingCapnpType>
 {
@@ -31,22 +31,30 @@ class OpaqueMapping : public OpaqueComposedItem<OpaqueMappingCapnpType>
                                   OpaqueMapping *parent);
 
         template <typename T>
-        IndexAccessProxy &operator=(T &other);
-
-        template <typename T>
         IndexAccessProxy &operator=(std::initializer_list<T> other)
         {
             //            operator=(other);
-            assignment_callback_(::msgx::conversion::opaque_item(mapping_parent_->get_orphange_functor_, other));
+            assignment_callback_(::msgx::conversion::opaque_item(mapping_parent_->get_orphanage_functor_, other));
+            return *this;
+        }
+
+        template <typename T>
+        IndexAccessProxy &operator=(T &other)
+        {
+            auto ptr = std::make_shared<msgx::BAHAHACompltelyOpaqueOitem>(mapping_parent_->get_orphanage_functor_);
+            assignment_callback_(::msgx::conversion::opaque_item(ptr, std::forward<T>(other)));
             return *this;
         }
 
         // r-value
         template <typename T>
-        IndexAccessProxy &operator=(T &&other);
+        IndexAccessProxy &operator=(T &&other)
+        {
+            operator=(other);
+            return *this;
+        }
 
-        template <typename T>
-        IndexAccessProxy operator[](const T &key);
+        IndexAccessProxy operator[](const std::string &key);
 
     protected:
         const std::function<void(const OpaqueItemPtr value_ptr)> assignment_callback_;
@@ -54,16 +62,14 @@ class OpaqueMapping : public OpaqueComposedItem<OpaqueMappingCapnpType>
     };
 
 public:
-    void build(msgx::Item::Oneof::Builder builder) override;
+    void build(msgx::type::Item::Oneof::Builder builder) override;
 
-    template <typename T>
-    IndexAccessProxy operator[](const T &key);
+    IndexAccessProxy operator[](const std::string &key);
 
-    void assign_pair(OpaqueItemPtr key, OpaqueItemPtr value);
+    void assign_pair(const std::string &key, OpaqueItemPtr value);
 
 private:
-    std::vector<std::array<OpaqueItemPtr, 2>> mapping_pair;
+    std::unordered_map<std::string, OpaqueItemPtr> mapping_pair;
 };
 
 }  // namespace msgx
-#include "mappings_template.h"
