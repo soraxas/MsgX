@@ -39,7 +39,17 @@ add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)
 # Build library
 add_library(msgx ${SOURCE_FILES})
 target_link_libraries(msgx PUBLIC ${LINK_LIBARARIES})
-target_link_libraries(msgx PUBLIC spdlog::spdlog)
+target_link_libraries(msgx PUBLIC spdlog::spdlog doctest::doctest)
+
+
+#CPMAddPackage("gh:doctest/doctest@2.4.11")
+#include(${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake)
+#
+#add_executable(exe_with_static_libs ../../tests/msgx_test.c++ ${SOURCE_FILES})
+#target_link_libraries(exe_with_static_libs doctest::doctest ${LINK_LIBARARIES})
+#doctest_discover_tests(exe_with_static_libs)
+
+
 #target_include_directories(msgx PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 #target_include_directories(msgx PRIVATE include)
 

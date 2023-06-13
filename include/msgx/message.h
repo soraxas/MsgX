@@ -3,6 +3,7 @@
 #include <capnp/message.h>
 
 #include "msgx/comms/zmq.h"
+#include "msgx/def.h"
 #include "msgx/opaque_item/mappings.h"
 
 namespace msgx
@@ -102,7 +103,7 @@ public:
         return getLinkedItemPtr<OpaqueMapping>();
     }
 
-    std::function<capnp::Orphanage(void)> get_orphanage_getter()
+    OrphanageGetter get_orphanage_getter() const
     {
         return orphanage_getter_;
     }
@@ -111,7 +112,7 @@ protected:
 public:
     capnp::MallocMessageBuilder msg_builder_;
 
-    std::function<capnp::Orphanage(void)> orphanage_getter_;
+    OrphanageGetter orphanage_getter_;
 
     std::unique_ptr<OpaqueMapping> maybe_mapping_;
 

@@ -43,7 +43,7 @@ public:
         zmq::send_flags send_flags = zmq::send_flags::dontwait;
         auto wordArray = capnp::messageToFlatArray(msg_builder);
 
-        // the following version will not copy memory, but use the supplied buffer directlyi
+        // the following version will not copy memory, but use the supplied buffer directly
         // The downside is that zmq doesn't immediately send msg (it might wait in some queue),
         // which means this function will return before zmq actually managed to send the message.
         // HENCE, it will likely read memory that had been overwritten by something else.

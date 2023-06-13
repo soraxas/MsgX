@@ -4,8 +4,7 @@
 #include <vector>
 
 #include "msgx.capnp.h"
-#include "msgx/opaque_item/composed_items.h"
-#include "msgx/opaque_item/conversion.h"
+#include "msgx/conversion/all.h"
 #include "msgx/opaque_item/items.h"
 
 namespace msgx
@@ -34,7 +33,8 @@ class OpaqueMapping : public OpaqueComposedItem<OpaqueMappingCapnpType>
         IndexAccessProxy &operator=(std::initializer_list<T> other)
         {
             //            operator=(other);
-            assignment_callback_(::msgx::conversion::opaque_item(mapping_parent_->get_orphanage_functor_, other));
+            auto ptr = std::make_shared<msgx::BAHAHACompltelyOpaqueOitem>(mapping_parent_->get_orphanage_functor_);
+            assignment_callback_(::msgx::conversion::opaque_item(ptr, other));
             return *this;
         }
 
@@ -68,8 +68,13 @@ public:
 
     void assign_pair(const std::string &key, OpaqueItemPtr value);
 
+    const OpaqueItemPtr &get(const std::string &key)
+    {
+        return mapping_pair_[key];
+    }
+
 private:
-    std::unordered_map<std::string, OpaqueItemPtr> mapping_pair;
+    std::unordered_map<std::string, OpaqueItemPtr> mapping_pair_;
 };
 
 }  // namespace msgx

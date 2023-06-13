@@ -6,7 +6,7 @@
 #include <utility>
 
 #include "msgx.capnp.h"
-#include "msgx/opaque_item/conversion.h"
+#include "msgx/conversion/all.h"
 #include "msgx/opaque_item/items.h"
 #include "msgx/opaque_item/mappings.h"
 

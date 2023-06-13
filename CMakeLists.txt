@@ -11,6 +11,8 @@ include(cmake/CPM.cmake)
 #CPMAddPackage("gh:catchorg/Catch2@3.2.1")
 CPMAddPackage("gh:capnproto/capnproto@0.10.4")
 
+CPMAddPackage("gh:TheLartians/Format.cmake@1.7.3")
+
 find_package(cppzmq QUIET)
 #find_package(Protobuf REQUIRED)
 #find_package(CapnProto)
@@ -46,7 +48,6 @@ option(RUN_TESTS "Run Tests?" FALSE)
 
 # Build shared libraries by default
 #set(BUILD_SHARED_LIBS True)
-
 
 
 ## Use local include and library directories
@@ -151,3 +152,8 @@ target_link_libraries(test msgx)
 #        #  EXPORT ${PROJECT_NAME}Targets
 #        DESTINATION "${INSTALL_CMAKE_DIR}"
 #        COMPONENT dev)
+
+
+if (${RUN_TESTS})
+    add_subdirectory(tests)
+endif ()

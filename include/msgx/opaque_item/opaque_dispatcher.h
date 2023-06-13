@@ -56,53 +56,54 @@ constexpr auto NdArrayAdoptOrphanDispatcher<msgx::type::Item>()
 
 ////////////////////////////////////////////////////////////
 
-template <typename DataType>
+template <typename T, typename std::enable_if<std::is_same<T, float_t>::value, int>::type * = nullptr>
 constexpr auto NdArrayInitArrayDispatcher()
 {
-    std::terminate();
+    return &msgx::type::Item::Oneof::Builder::initFloatArray;
 }
 
-template <>
-constexpr auto NdArrayInitArrayDispatcher<double_t>()
+template <typename T, typename std::enable_if<std::is_same<T, double_t>::value, int>::type * = nullptr>
+constexpr auto NdArrayInitArrayDispatcher()
 {
     return &msgx::type::Item::Oneof::Builder::initDoubleArray;
-};
+}
 
-template <>
-constexpr auto NdArrayInitArrayDispatcher<float_t>()
-{
-    return &msgx::type::Item::Oneof::Builder::initFloatArray;
-};
-
-template <>
-constexpr auto NdArrayInitArrayDispatcher<int32_t>()
+template <typename T, typename std::enable_if<std::is_same<T, uint8_t>::value ||   //
+                                              std::is_same<T, uint16_t>::value ||  //
+                                              std::is_same<T, int8_t>::value ||    //
+                                              std::is_same<T, int16_t>::value ||   //
+                                              std::is_same<T, int32_t>::value>::type * = nullptr>
+constexpr auto NdArrayInitArrayDispatcher()
 {
     return &msgx::type::Item::Oneof::Builder::initIntArray;
-};
+}
 
-template <>
-constexpr auto NdArrayInitArrayDispatcher<int64_t>()
+template <typename T, typename std::enable_if<std::is_same<T, uint32_t>::value ||  //
+                                              std::is_same<T, uint64_t>::value ||  // lossy
+                                              std::is_same<T, int64_t>::value>::type * = nullptr>
+constexpr auto NdArrayInitArrayDispatcher()
 {
     return &msgx::type::Item::Oneof::Builder::initLongArray;
-};
+}
 
-template <>
-constexpr auto NdArrayInitArrayDispatcher<bool>()
+template <typename T, typename std::enable_if<std::is_same<T, bool>::value, int>::type * = nullptr>
+constexpr auto NdArrayInitArrayDispatcher()
 {
     return &msgx::type::Item::Oneof::Builder::initBoolArray;
-};
+}
 
-template <>
-constexpr auto NdArrayInitArrayDispatcher<std::string>()
+template <typename T, typename std::enable_if<std::is_same<T, const char *>::value ||  //
+                                              std::is_same<T, std::string>::value>::type * = nullptr>
+constexpr auto NdArrayInitArrayDispatcher()
 {
     return &msgx::type::Item::Oneof::Builder::initStringArray;
-};
+}
 
-template <>
-constexpr auto NdArrayInitArrayDispatcher<msgx::type::Item>()
+template <typename T, typename std::enable_if<std::is_same<T, msgx::type::Item>::value, int>::type * = nullptr>
+constexpr auto NdArrayInitArrayDispatcher()
 {
     return &msgx::type::Item::Oneof::Builder::initAnyArray;
-};
+}
 
 ////////////////////////////////////////////////////////////
 

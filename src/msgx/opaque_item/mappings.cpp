@@ -17,10 +17,10 @@ OpaqueMapping::IndexAccessProxy::IndexAccessProxy(
 void OpaqueMapping::build(msgx::type::Item::Oneof::Builder builder)
 {
     auto mapping_builder = builder.initMapping();
-    auto entry_builder = mapping_builder.initEntries(mapping_pair.size());
+    auto entry_builder = mapping_builder.initEntries(mapping_pair_.size());
 
     size_t i = 0;
-    for (auto &&keyval : mapping_pair)
+    for (auto &&keyval : mapping_pair_)
     {
         if (!keyval.second)
             throw std::runtime_error("Value is null for item with key" + keyval.first);
@@ -63,7 +63,7 @@ OpaqueMapping::IndexAccessProxy OpaqueMapping::IndexAccessProxy::operator[](cons
 
 void OpaqueMapping::assign_pair(const std::string &key, OpaqueItemPtr value)
 {
-    mapping_pair[key] = std::move(value);
+    mapping_pair_[key] = std::move(value);
 }
 
 }  // namespace msgx

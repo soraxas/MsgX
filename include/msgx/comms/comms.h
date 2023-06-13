@@ -1,6 +1,7 @@
 #pragma once
 
 #include <capnp/message.h>
+#include <capnp/serialize.h>
 
 #include <string>
 

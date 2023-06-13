@@ -10,7 +10,6 @@
 
 #include "message.h"
 #include "msgx.capnp.h"
-#include "msgx/capnp_conversion.h"
 #include "msgx/comms/zmq.h"
 
 namespace msgx

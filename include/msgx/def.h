@@ -4,6 +4,8 @@
 
 #include <functional>
 
+#include "msgx.capnp.h"
+
 namespace msgx
 {
 
