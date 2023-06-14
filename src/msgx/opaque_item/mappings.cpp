@@ -32,7 +32,7 @@ void OpaqueMapping::build(msgx::type::Item::Oneof::Builder builder)
 
 OpaqueMapping::IndexAccessProxy OpaqueMapping::operator[](const std::string &key)
 {
-    auto callback = [this, key](const OpaqueItemPtr &value_ptr) { assign_pair(key, value_ptr); };
+    auto callback = [this, key](OpaqueItemPtr value_ptr) { assign_pair(key, std::move(value_ptr)); };
 
     return OpaqueMapping::IndexAccessProxy(callback, this);
 }
@@ -42,19 +42,19 @@ OpaqueMapping::IndexAccessProxy OpaqueMapping::IndexAccessProxy::operator[](cons
     // my value would now be a mapping as well,
     // as a nested structure
 
-    auto nested_callback = [this, key](const OpaqueItemPtr &value_ptr)
+    auto nested_callback = [this, key](OpaqueItemPtr value_ptr)
     {
         // only call the actual callback if some concrete value is assigned
         // as the result of this index
 
         // create a new instance of a nested mapping
-        auto nested_mapping = std::make_shared<OpaqueMapping>(mapping_parent_->get_orphanage_functor_);
+        auto nested_mapping = std::make_unique<OpaqueMapping>(mapping_parent_->get_orphanage_functor_);
 
         // actually assign the pair (instead of using [], which will triggers index proxy again)
-        nested_mapping->assign_pair(key, value_ptr);
+        nested_mapping->assign_pair(key, std::move(value_ptr));
 
         // callback our previous caller
-        assignment_callback_(nested_mapping);
+        assignment_callback_(std::move(nested_mapping));
 
         // now, changes will bubble up
     };

@@ -2,9 +2,68 @@
 
 #include <capnp/message.h>
 
+#include <utility>
+
 #include "msgx/comms/zmq.h"
 #include "msgx/def.h"
 #include "msgx/opaque_item/mappings.h"
+
+class OpaqueMappingOrBindableItem
+{
+public:
+    constexpr OpaqueMappingOrBindableItem() : uninitialised_dummy_{false}
+    {
+    }
+
+    ~OpaqueMappingOrBindableItem()
+    {
+        destroy();
+    }
+
+    void destroy()
+    {
+        switch (type)
+        {
+            case unionType::Empty:
+                break;
+            case unionType::BindableItem:
+                mapping_.~OpaqueMapping();
+                break;
+            case unionType::Mapping:
+                bindable_item_.~BindableOpaqueItem();
+                break;
+        }
+        type = unionType::Empty;
+    }
+
+    void set_mapping(msgx::OrphanageGetter get_orphanage_functor)
+    {
+        destroy();
+        new (&mapping_) msgx::OpaqueMapping{std::move(get_orphanage_functor)};
+        type = unionType::Mapping;
+    }
+
+    void set_bindable_item(msgx::OrphanageGetter get_orphanage_functor)
+    {
+        destroy();
+        new (&bindable_item_) msgx::BindableOpaqueItem{std::move(get_orphanage_functor)};
+        type = unionType::BindableItem;
+    }
+
+    enum class unionType
+    {
+        Empty,
+        BindableItem,
+        Mapping
+    } type = unionType::Empty;  // match the default constructor of enum
+
+    union
+    {
+        bool uninitialised_dummy_;
+        msgx::OpaqueMapping mapping_;
+        msgx::BindableOpaqueItem bindable_item_;
+    };
+};
 
 namespace msgx
 {
@@ -18,76 +77,63 @@ public:
     template <class... Args>
     OpaqueItemPtr container(Args &&...args)
     {
-        auto ptr = std::make_shared<msgx::BAHAHACompltelyOpaqueOitem>(orphanage_getter_);
-        return ::msgx::conversion::opaque_item(ptr, std::forward<Args>(args)...);
+        auto ptr = std::make_unique<msgx::BindableOpaqueItem>(orphanage_getter_);
+        ::msgx::conversion::opaque_item(*ptr, std::forward<Args>(args)...);
+        return ptr;
     }
 
     template <typename T>
     MessageX &operator=(T &other)
     {
-        _destroy_maybe_mapping();
-        //        /auto root_builder = msg_builder_.initRoot<msgx::type::Item>();
-        maybe_opaque_item_ = std::make_shared<msgx::BAHAHACompltelyOpaqueOitem>(get_orphanage_getter());
+        contained_item_.set_bindable_item(get_orphanage_getter());
 
-        ::msgx::conversion::opaque_item(maybe_opaque_item_, std::forward<T>(other));
+        ::msgx::conversion::opaque_item(contained_item_.bindable_item_, std::forward<T>(other));
         return *this;
     }
 
     template <typename T>
     MessageX &operator=(const std::initializer_list<T> &other)
     {
-        // explicitly forward initialiser list
-        _destroy_maybe_mapping();
-        maybe_opaque_item_ = std::make_shared<msgx::BAHAHACompltelyOpaqueOitem>(get_orphanage_getter());
-
-        ::msgx::conversion::opaque_item(maybe_opaque_item_, other);
-        return *this;
+        return operator=<const std::initializer_list<T>>(other);  // NOLINT(misc-unconventional-assign-operator)
     }
 
     // r-value
     template <typename T>
     MessageX &operator=(T &&other)
     {
-        operator=(other);
-        return *this;
+        return operator=(other);  // NOLINT(misc-unconventional-assign-operator)
     }
-
-    //    MessageX &operator=(OpaqueItemPtr &other)
-    //    {
-    //        ::msgx::conversion::opaque_item(root_builder, other);
-    //        return *this;
-    //    }
 
     void send()
     {
-        if (maybe_mapping_)
-        {
-            auto root_builder = msg_builder_.initRoot<msgx::type::Item>();
-            maybe_mapping_->build(root_builder.initOneof());
-            _destroy_maybe_mapping();
-        }
-        else if (maybe_opaque_item_)
-        {
-            auto root_builder = msg_builder_.initRoot<msgx::type::Item>();
-            maybe_opaque_item_->build(root_builder.initOneof());
-        }
-        comms::Zmq::Send(msg_builder_);
-    }
+        auto root_builder = msg_builder_.initRoot<msgx::type::Item>();
 
-    void _destroy_maybe_mapping()
-    {
-        maybe_mapping_.reset();
+        switch (contained_item_.type)
+        {
+            case OpaqueMappingOrBindableItem::unionType::Mapping:
+                contained_item_.mapping_.build(root_builder.initOneof());
+                break;
+            case OpaqueMappingOrBindableItem::unionType::BindableItem:
+                contained_item_.bindable_item_.build(root_builder.initOneof());
+                break;
+            case OpaqueMappingOrBindableItem::unionType::Empty:
+                // it's emtpy :L but we will send it eitherway
+                SPDLOG_DEBUG("Message to be send is empty");
+                break;
+        }
+
+        comms::Zmq::Send(msg_builder_);
     }
 
     // forward indexing call to inner mapping
     auto operator[](const std::string &key)
     {
         // initialise this root as a map
-        if (!maybe_mapping_)
+        if (contained_item_.type != OpaqueMappingOrBindableItem::unionType::Mapping)
         {
-            maybe_mapping_ = std::make_unique<OpaqueMapping>([this]() { return msg_builder_.getOrphanage(); });
+            contained_item_.set_mapping([this]() { return msg_builder_.getOrphanage(); });
         }
-        return (*maybe_mapping_)[key];
+        return contained_item_.mapping_[key];
     }
 
     template <typename OpaqueItemType>
@@ -109,18 +155,11 @@ public:
     }
 
 protected:
-public:
     capnp::MallocMessageBuilder msg_builder_;
 
     OrphanageGetter orphanage_getter_;
 
-    std::unique_ptr<OpaqueMapping> maybe_mapping_;
-
-    std::shared_ptr<msgx::BAHAHACompltelyOpaqueOitem> maybe_opaque_item_;
-
-    //    OpaqueItemPtr root_;
-
-public:
+    OpaqueMappingOrBindableItem contained_item_;
 };
 
 }  // namespace msgx

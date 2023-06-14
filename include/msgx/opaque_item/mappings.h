@@ -1,23 +1,19 @@
 #pragma once
 
 #include <functional>
-#include <vector>
+#include <unordered_map>
 
 #include "msgx.capnp.h"
 #include "msgx/conversion/all.h"
-#include "msgx/opaque_item/items.h"
 
 namespace msgx
 {
 
-using OpaqueMappingCapnpType = ::msgx::type::Map<::msgx::type::Item, ::msgx::type::Item>;
-
-class OpaqueMapping : public OpaqueComposedItem<OpaqueMappingCapnpType>
+class OpaqueMapping : public OpaqueItem
 {
-    using CapnpMsgType = OpaqueMappingCapnpType;
-
+protected:
     // use superclass constructor
-    using OpaqueComposedItem::OpaqueComposedItem;
+    using OpaqueItem::OpaqueItem;
 
     struct IndexAccessProxy
     {
@@ -30,19 +26,19 @@ class OpaqueMapping : public OpaqueComposedItem<OpaqueMappingCapnpType>
                                   OpaqueMapping *parent);
 
         template <typename T>
-        IndexAccessProxy &operator=(std::initializer_list<T> other)
+        IndexAccessProxy &operator=(T &other)
         {
-            //            operator=(other);
-            auto ptr = std::make_shared<msgx::BAHAHACompltelyOpaqueOitem>(mapping_parent_->get_orphanage_functor_);
-            assignment_callback_(::msgx::conversion::opaque_item(ptr, other));
+            auto ptr = std::make_unique<msgx::BindableOpaqueItem>(mapping_parent_->get_orphanage_functor_);
+            ::msgx::conversion::opaque_item(*ptr, std::forward<T>(other));
+            assignment_callback_(std::move(ptr));
             return *this;
         }
 
-        template <typename T>
-        IndexAccessProxy &operator=(T &other)
+        IndexAccessProxy &operator=(msgx::OpaqueItemPtr other)
         {
-            auto ptr = std::make_shared<msgx::BAHAHACompltelyOpaqueOitem>(mapping_parent_->get_orphanage_functor_);
-            assignment_callback_(::msgx::conversion::opaque_item(ptr, std::forward<T>(other)));
+            auto ptr = std::make_unique<msgx::BindableOpaqueItem>(mapping_parent_->get_orphanage_functor_);
+            ::msgx::conversion::opaque_item(*ptr, *other);
+            assignment_callback_(std::move(ptr));
             return *this;
         }
 
@@ -50,14 +46,19 @@ class OpaqueMapping : public OpaqueComposedItem<OpaqueMappingCapnpType>
         template <typename T>
         IndexAccessProxy &operator=(T &&other)
         {
-            operator=(other);
-            return *this;
+            return operator=<T>(other);  // NOLINT(misc-unconventional-assign-operator)
+        }
+
+        template <typename T>
+        IndexAccessProxy &operator=(const std::initializer_list<T> &other)
+        {
+            return operator=<const std::initializer_list<T>>(other);  // NOLINT(misc-unconventional-assign-operator)
         }
 
         IndexAccessProxy operator[](const std::string &key);
 
     protected:
-        const std::function<void(const OpaqueItemPtr value_ptr)> assignment_callback_;
+        const std::function<void(OpaqueItemPtr value_ptr)> assignment_callback_;
         OpaqueMapping *mapping_parent_;
     };
 

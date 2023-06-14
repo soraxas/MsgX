@@ -90,16 +90,16 @@ void Message::send(zmq::send_flags send_flags)
     //
     //    auto ha = msg.lolHAHAcontainer();
 
-    auto haha = std::make_shared<msgx::BAHAHACompltelyOpaqueOitem>(msg.get_orphanage_getter());
+    auto haha = std::make_shared<msgx::BindableOpaqueItem>(msg.get_orphanage_getter());
 
-    msgx::conversion::opaque_item(haha, 1.2);
+    msgx::conversion::opaque_item(*haha, 1.2);
 
-    msgx::conversion::opaque_item(haha, {2., 2.32, 3., 1., 2.});
-    msgx::conversion::opaque_item(haha, "{2.,2.32,3.,1.,2.}");
-    msgx::conversion::opaque_item(haha, "{2.,2.32,3.,1.,2.}");
-    msgx::conversion::opaque_item(haha, "{2.,2.32,3.,1.,2.}");
-    msgx::conversion::opaque_item(haha, "{2.,2.32,3.,1.,2.}");
-    msgx::conversion::opaque_item(haha, "{2.,2.32,3.,1.,2.}");
+    msgx::conversion::opaque_item(*haha, {2., 2.32, 3., 1., 2.});
+    msgx::conversion::opaque_item(*haha, "{2.,2.32,3.,1.,2.}");
+    msgx::conversion::opaque_item(*haha, "{2.,2.32,3.,1.,2.}");
+    msgx::conversion::opaque_item(*haha, "{2.,2.32,3.,1.,2.}");
+    msgx::conversion::opaque_item(*haha, "{2.,2.32,3.,1.,2.}");
+    msgx::conversion::opaque_item(*haha, "{2.,2.32,3.,1.,2.}");
 
     //    msg = 3;
 

@@ -2,10 +2,6 @@
 
 #include <spdlog/spdlog.h>
 
-#include <memory>
-#include <string>
-#include <utility>
-
 #include "msgx/def.h"
 
 namespace msgx
@@ -14,20 +10,26 @@ namespace msgx
 class OpaqueItem
 {
 public:
-    explicit OpaqueItem() = default;
-
-    virtual void build(OpaqueItemBuilder builder) = 0;
-};
-
-using OpaqueItemAssignmentCallback = std::function<void(OpaqueItemBuilder builder)>;
-
-class BAHAHACompltelyOpaqueOitem : public OpaqueItem
-{
-public:
-    explicit BAHAHACompltelyOpaqueOitem(OrphanageGetter get_orphange_functor = nullptr)
-      : get_orphanage_functor_(std::move(get_orphange_functor))
+    explicit OpaqueItem(OrphanageGetter get_orphanage_functor = nullptr)
+      : get_orphanage_functor_(std::move(get_orphanage_functor))
     {
     }
+
+    virtual void build(OpaqueItemBuilder builder) = 0;
+
+    bool has_orphanage() const
+    {
+        return get_orphanage_functor_ != nullptr;
+    }
+
+protected:
+    const OrphanageGetter get_orphanage_functor_;
+};
+
+class BindableOpaqueItem : public OpaqueItem
+{
+public:
+    using OpaqueItem::OpaqueItem;
 
     void build(OpaqueItemBuilder builder) override
     {
@@ -96,18 +98,12 @@ public:
         }
     }
 
-    bool has_orphanage()
-    {
-        return get_orphanage_functor_ != nullptr;
-    }
-
     OpaqueItemBuilder get_orphan_or_malloc_builder()
     {
-        if (!get_orphanage_functor_)
+        if (!has_orphanage())
             throw std::runtime_error("This ptr is not associated with any orphanage");
 
         orphan_ = std::move(get_orphanage_functor_().newOrphan<msgx::type::Item::Oneof>());
-
         return orphan_.get();
     }
 
@@ -122,44 +118,9 @@ public:
     capnp::Orphan<type::Item::Oneof> orphan_;
 
     std::function<void(OpaqueItemBuilder builder)> assign_primitive_callback_;
-
-    const OrphanageGetter get_orphanage_functor_;
 };
 
-using MyOpaqueItemPtr = ::std::shared_ptr<BAHAHACompltelyOpaqueOitem>;
-
-template <typename CapnpItemType>
-class OpaqueComposedItem : public OpaqueItem
-{
-public:
-    explicit OpaqueComposedItem(const std::function<capnp::Orphanage(void)> &get_orphange_functor = nullptr)
-      : get_orphanage_functor_(get_orphange_functor)
-    {
-    }
-
-protected:
-    inline bool has_orphan_getter()
-    {
-        return get_orphanage_functor_ != nullptr;
-    }
-
-    template <typename T>
-    void assign(T &&)
-    {
-        static_assert(std::is_same<T, std::false_type>::value, "You need to overwrite this method.");
-    }
-
-    capnp::BuilderFor<CapnpItemType> createOrphanGetBuilder()
-    {
-        orphan_ = get_orphanage_functor_().newOrphan<CapnpItemType>();
-        return orphan_.get();
-    }
-
-    const std::function<capnp::Orphanage(void)> get_orphanage_functor_;
-
-    capnp::Orphan<CapnpItemType> orphan_;
-};
-
-using OpaqueItemPtr = std::shared_ptr<OpaqueItem>;
+using OpaqueItemPtr = std::unique_ptr<OpaqueItem>;
+using BindableOpaqueItemPtr = std::unique_ptr<BindableOpaqueItem>;
 
 }  // namespace msgx

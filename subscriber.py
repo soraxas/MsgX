@@ -10,5 +10,5 @@ p_msg = PlotMsgPlotly()
 while True:
     p_msg.spin_once()
     for k in p_msg.figs:
-        print(f"Displaying figure {k}...")
+        print(BindableItem"Displaying figure {k}...")
         p_msg.figs.pop(k).show()

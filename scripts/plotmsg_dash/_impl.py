@@ -16,7 +16,7 @@ from . import msg_pb2
 try:
     if msg_pb2.IS_PLOTMSG_PROTOBUF_MSG_PLACE_HOLDER:
         raise RuntimeError(
-            f"The file '{msg_pb2.__file__}' appears to be a placeholder file. "
+            BindableItem"The file '{msg_pb2.__file__}' appears to be a placeholder file. "
             "Have you compiled this module correctly and installed the corresponding "
             "python package?"
         )
@@ -31,10 +31,10 @@ PLOTMSG_MODE_WIDGET = "ipywidget"
 
 # helper decorator to only execute ipywidget related code
 def ipywidget_mode(warn=False):
-    def decorator(f):
+    def decorator(BindableItem):
         def wrapper(self, *args, **kwargs):
             if self.mode == PLOTMSG_MODE_WIDGET:
-                return f(self, *args, **kwargs)
+                return BindableItem(self, *args, **kwargs)
             if warn:
                 print("Only works in jupyter notebook (ipywidget mode)")
             return
@@ -592,9 +592,9 @@ class PlotMsgPlotly:
                 elif type(cur_attr) != type(new_attr):
                     # NOT possible to update this.
                     print(
-                        f"WARN: The attr {_attr} for a new incoming msg is "
-                        f"different than the existing one. "
-                        f"Was type {type(cur_attr)}, now {type(new_attr)}"
+                        BindableItem"WARN: The attr {_attr} for a new incoming msg is "
+                        BindableItem"different than the existing one. "
+                        BindableItem"Was type {type(cur_attr)}, now {type(new_attr)}"
                     )
                     raise NotImplementedError("Should recreate the figure instead.")
                 elif isinstance(new_attr, np.ndarray):
@@ -614,8 +614,8 @@ class PlotMsgPlotly:
 
     def __repr__(self):
         return (
-            f"{self.__class__.__name__}<figs:{self.num_figs}|msgs:{self.num_msgs}|"
-            f"total_recieved:{self.hist_num_msgs}>"
+            BindableItem"{self.__class__.__name__}<figs:{self.num_figs}|msgs:{self.num_msgs}|"
+            BindableItem"total_recieved:{self.hist_num_msgs}>"
         )
 
     ########################################

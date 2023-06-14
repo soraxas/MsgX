@@ -10,7 +10,7 @@ namespace conversion
 {
 
 template <typename ContainerDataType, typename DataType = typename ContainerDataType::value_type>
-inline auto opaque_item(const msgx::MyOpaqueItemPtr &item, const ContainerDataType &values)
+void opaque_item(msgx::BindableOpaqueItem &item, const ContainerDataType &values)
 {
     auto _main_body = [](OpaqueItemBuilder builder, const ContainerDataType &values)
     {
@@ -20,16 +20,15 @@ inline auto opaque_item(const msgx::MyOpaqueItemPtr &item, const ContainerDataTy
             values);
     };
 
-    helpers::_run_callback_with_or_without_orphanage<ContainerDataType>(item, values, _main_body);
-    return item;
+    ::msgx::helpers::_run_callback_with_or_without_orphanage<ContainerDataType>(item, values, _main_body);
 }
 
 template <typename DataType>
-inline auto opaque_item(const msgx::MyOpaqueItemPtr &item, const std::initializer_list<DataType> &values)
+void opaque_item(msgx::BindableOpaqueItem &item, const std::initializer_list<DataType> &values)
 {
     SPDLOG_DEBUG("[Conversion] initializer_list type {} with size '{}'", typeid(DataType).name(), values.size());
 
-    return msgx::conversion::opaque_item<std::initializer_list<DataType>>(item, values);
+    msgx::conversion::opaque_item<std::initializer_list<DataType>>(item, values);
 }
 
 }  // namespace conversion

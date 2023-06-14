@@ -33,20 +33,20 @@ private:
 };
 
 template <typename T>
-void _run_callback_with_or_without_orphanage(const msgx::MyOpaqueItemPtr &opaque_item, const T &values,
+void _run_callback_with_or_without_orphanage(msgx::BindableOpaqueItem &opaque_item, const T &values,
                                              const std::function<void(OpaqueItemBuilder, const T &)> _main_body)
 {
-    if (opaque_item->has_orphanage())
+    if (opaque_item.has_orphanage())
     {
         SPDLOG_TRACE("creating an orphan for datatype: {}", typeid(T).name());
         // construct it in-place right now to avoid copy
-        _main_body(opaque_item->get_orphan_or_malloc_builder(), values);
+        _main_body(opaque_item.get_orphan_or_malloc_builder(), values);
     }
     else
     {
         SPDLOG_TRACE("no orphanage, copying datatype to callback: {}", typeid(T).name());
         // bind a lambda by copying value, and set it as callback
-        opaque_item->set_assignment_callback(                //
+        opaque_item.set_assignment_callback(                 //
             [values, _main_body](OpaqueItemBuilder builder)  //
             {                                                //
                 _main_body(builder, values);                 //
