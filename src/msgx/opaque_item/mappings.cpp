@@ -1,9 +1,4 @@
-
-
 #include "msgx/opaque_item/mappings.h"
-
-#include <stdexcept>
-#include <utility>
 
 namespace msgx
 {
@@ -37,6 +32,14 @@ OpaqueMapping::IndexAccessProxy OpaqueMapping::operator[](const std::string &key
     return OpaqueMapping::IndexAccessProxy(callback, this);
 }
 
+OpaqueMapping::IndexAccessProxy &OpaqueMapping::IndexAccessProxy::operator=(msgx::OpaqueItemPtr other)
+{
+    auto ptr = std::make_unique<msgx::BindableOpaqueItem>(mapping_parent_->get_orphanage_functor_);
+    ::msgx::conversion::opaque_item(*ptr, *other);
+    assignment_callback_(std::move(ptr));
+    return *this;
+}
+
 OpaqueMapping::IndexAccessProxy OpaqueMapping::IndexAccessProxy::operator[](const std::string &key)
 {
     // my value would now be a mapping as well,
@@ -64,6 +67,11 @@ OpaqueMapping::IndexAccessProxy OpaqueMapping::IndexAccessProxy::operator[](cons
 void OpaqueMapping::assign_pair(const std::string &key, OpaqueItemPtr value)
 {
     mapping_pair_[key] = std::move(value);
+}
+
+const OpaqueItemPtr &OpaqueMapping::get(const std::string &key)
+{
+    return mapping_pair_[key];
 }
 
 }  // namespace msgx

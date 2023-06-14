@@ -1,7 +1,7 @@
 #pragma once
 
 #include "msgx/conversion/common.h"
-#include "msgx/opaque_item/items.h"
+#include "msgx/opaque_item/item.h"
 #include "msgx/opaque_item/opaque_dispatcher.h"
 
 namespace msgx

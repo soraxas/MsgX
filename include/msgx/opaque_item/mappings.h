@@ -5,6 +5,7 @@
 
 #include "msgx.capnp.h"
 #include "msgx/conversion/all.h"
+#include "msgx/opaque_item/bindable_item.h"
 
 namespace msgx
 {
@@ -34,13 +35,7 @@ protected:
             return *this;
         }
 
-        IndexAccessProxy &operator=(msgx::OpaqueItemPtr other)
-        {
-            auto ptr = std::make_unique<msgx::BindableOpaqueItem>(mapping_parent_->get_orphanage_functor_);
-            ::msgx::conversion::opaque_item(*ptr, *other);
-            assignment_callback_(std::move(ptr));
-            return *this;
-        }
+        IndexAccessProxy &operator=(msgx::OpaqueItemPtr other);
 
         // r-value
         template <typename T>
@@ -69,10 +64,7 @@ public:
 
     void assign_pair(const std::string &key, OpaqueItemPtr value);
 
-    const OpaqueItemPtr &get(const std::string &key)
-    {
-        return mapping_pair_[key];
-    }
+    const OpaqueItemPtr &get(const std::string &key);
 
 private:
     std::unordered_map<std::string, OpaqueItemPtr> mapping_pair_;

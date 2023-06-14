@@ -3,7 +3,7 @@
 #include <sstream>
 #include <vector>
 
-#include "msgx/opaque_item/items.h"
+#include "msgx/opaque_item/bindable_item.h"
 
 namespace msgx
 {

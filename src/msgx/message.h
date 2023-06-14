@@ -7,7 +7,7 @@
 
 #include "msgx.capnp.h"
 #include "msgx/conversion/all.h"
-#include "msgx/opaque_item/items.h"
+#include "msgx/opaque_item/item.h"
 #include "msgx/opaque_item/mappings.h"
 
 namespace msgx

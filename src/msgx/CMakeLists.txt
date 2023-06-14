@@ -3,7 +3,8 @@
 message(include_directories (${CMAKE_SOURCE_DIR}/include)
         okok${CAPNP_INCLUDE_DIRS}haie)
 
-set(SOURCE_FILES main.cpp opaque_item/mappings.cpp)
+set(SOURCE_FILES main.cpp opaque_item/mappings.cpp opaque_item/item.cpp
+                 opaque_item/bindable_item.cpp)
 set(HEADER_FILES
     ${CAPNP_HEADER}
     # msgx/main.hpp msgx/_impl/core.hpp msgx/_impl/dictionary.hpp

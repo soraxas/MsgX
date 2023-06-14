@@ -1,6 +1,6 @@
 #pragma once
 
-#include "msgx/opaque_item/items.h"
+#include "msgx/opaque_item/item.h"
 
 namespace msgx
 {
