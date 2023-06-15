@@ -13,8 +13,6 @@ class BindableOpaqueItem : public OpaqueItem
 public:
     using OpaqueItem::OpaqueItem;
 
-    ~BindableOpaqueItem() noexcept override = default;
-
     void build(OpaqueItemBuilder builder) override;
 
     OpaqueItemBuilder get_orphan_or_malloc_builder();

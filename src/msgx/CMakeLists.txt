@@ -26,7 +26,7 @@ add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)
 # Build library
 add_library(msgx ${SOURCE_FILES})
 target_link_libraries(msgx PUBLIC ${LINK_LIBARARIES})
-target_link_libraries(msgx PUBLIC spdlog::spdlog doctest::doctest)
+target_link_libraries(msgx PUBLIC spdlog::spdlog)
 
 # CPMAddPackage("gh:doctest/doctest@2.4.11")
 # include(${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake)

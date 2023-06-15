@@ -22,8 +22,6 @@ public:
     {
     }
 
-    virtual ~OpaqueItem() = default;
-
     virtual void build(OpaqueItemBuilder builder) = 0;
 
     bool has_orphanage() const;

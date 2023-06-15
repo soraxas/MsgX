@@ -3,16 +3,22 @@ project(MsgX CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CPM_USE_LOCAL_PACKAGES ON)
 # add dependencies
 include(cmake/CPM.cmake)
 
-# CPMAddPackage("gh:fmtlib/fmt#7.1.3") CPMAddPackage("gh:nlohmann/json@3.10.5")
-# CPMAddPackage("gh:catchorg/Catch2@3.2.1")
-cpmaddpackage("gh:capnproto/capnproto@0.10.4")
+# CapnProto depends on some exported variables, (and CPM does not export them due to function scope)
+# so we will need to use find_package as a workaround
+find_package(CapnProto QUIET)
+if(NOT CapnProto_FOUND)
+  CPMFindPackage("gh:capnproto/capnproto@0.10.3")
 
-cpmaddpackage("gh:TheLartians/Format.cmake@1.7.3")
+  # Maintain build compatibility between find_package and CMakeLists.txt variants
+  set(CAPNPROTO_LIBRARIES CapnProto)
+endif()
 
-find_package(cppzmq QUIET)
+
+# find_package(cppzmq QUIET)
 # find_package(Protobuf REQUIRED) find_package(CapnProto)
 
 # set(CapnProto_DIR )
@@ -74,8 +80,8 @@ include_directories(include)
 
 add_subdirectory(src)
 
-add_executable(test main.c++)
-target_link_libraries(test msgx)
+# add_executable(test main.c++)
+# target_link_libraries(test msgx)
 # target_link_libraries(test msgx)
 
 # python scripts add_custom_target( copy-python-pkg-template ALL COMMAND
