@@ -9,7 +9,7 @@ OpaqueMapping::IndexAccessProxy::IndexAccessProxy(
 {
 }
 
-void OpaqueMapping::build(msgx::type::Item::Oneof::Builder builder)
+void OpaqueMapping::build(OpaqueItemBuilder builder)
 {
     auto mapping_builder = builder.initMapping();
     auto entry_builder = mapping_builder.initEntries(mapping_pair_.size());

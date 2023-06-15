@@ -31,21 +31,6 @@ inline void opaque_item(msgx::BindableOpaqueItem &item, const char *value)
     item.set_assignment_callback([value](OpaqueItemBuilder builder) { builder.setString(value); });
 }
 
-// identity function that passthrough its input
-template <typename Derived, typename = std::enable_if_t<std::is_base_of<::msgx::OpaqueItem, Derived>::value>>
-inline void opaque_item(msgx::BindableOpaqueItem &item, std::shared_ptr<Derived> rhs_item)
-{
-    SPDLOG_DEBUG("[Conversion] passthrough opaque ptr");
-    item.set_assignment_callback([rhs_item](OpaqueItemBuilder builder) { rhs_item->build(builder); });
-}
-
-// identity function that passthrough its input
-inline void opaque_item(msgx::BindableOpaqueItem &item, msgx::OpaqueItem &rhs_item)
-{
-    SPDLOG_DEBUG("[Conversion] passthrough opaque ptr");
-    item.set_assignment_callback([&rhs_item](OpaqueItemBuilder builder) { rhs_item.build(builder); });
-}
-
 /*
  * ===== signed =====
  */

@@ -18,7 +18,7 @@ using Which = msgx::type::Item::Oneof::Which;
         auto &my_key_ptr = mapping.get("my_key");                                                                      \
         CHECK(my_key_ptr);                                                                                             \
         auto &downcast = dynamic_cast<BindableOpaqueItem &>(*my_key_ptr);                                              \
-        CHECK_EQ(downcast.orphan_, nullptr);                                                                           \
+        CHECK(downcast.has_orphan());                                                                                  \
         OpaqueItemBuilder builder = msg_builder.initRoot<msgx::type::Item::Oneof>();                                   \
         downcast.build(builder);                                                                                       \
         CHECK_EQ(builder.which(), VALUE_TYPE);                                                                         \
@@ -73,9 +73,9 @@ TEST_CASE("Test with and without orphanage")
     CHECK(my_key_ptr);
     auto &downcast = dynamic_cast<BindableOpaqueItem &>(*my_key_ptr);
     if (has_orphanage)
-        CHECK_NE(downcast.orphan_, nullptr);
+        CHECK(!downcast.has_orphan());
     else
-        CHECK_EQ(downcast.orphan_, nullptr);
+        CHECK(downcast.has_orphan());
 
     // both of them should still allow us to build
     OpaqueItemBuilder builder = msg_builder.initRoot<msgx::type::Item::Oneof>();
@@ -94,7 +94,7 @@ TEST_CASE("Test with and without orphanage")
         auto &my_key_ptr = mapping.get("my_key");                                                                      \
         CHECK(my_key_ptr);                                                                                             \
         auto &downcast = dynamic_cast<BindableOpaqueItem &>(*my_key_ptr);                                              \
-        CHECK_NE(downcast.orphan_, nullptr);                                                                           \
+        CHECK(!downcast.has_orphan());                                                                                 \
         OpaqueItemBuilder builder = msg_builder.initRoot<msgx::type::Item::Oneof>();                                   \
         downcast.build(builder);                                                                                       \
         CHECK_EQ(builder.which(), VALUE_TYPE);                                                                         \

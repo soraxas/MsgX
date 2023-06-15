@@ -11,6 +11,9 @@
 #include "message.h"
 #include "msgx.capnp.h"
 #include "msgx/comms/zmq.h"
+#include "msgx/kwargs.h"
+
+using namespace msgx::kwargs;
 
 namespace msgx
 {
@@ -35,14 +38,8 @@ public:
     bool already_sent_{false};
 };
 
-std::string operator""_a(const char *str, std::size_t)
-{
-    return std::string{str} + str;
-}
-
 void Message::send(zmq::send_flags send_flags)
 {
-    sxs::println("okok ", "ha"_a);
     if (!already_sent_)
     {
         already_sent_ = true;
@@ -77,7 +74,9 @@ void Message::send(zmq::send_flags send_flags)
 
     msg = "ha";
 
+    sxs::println("trying");
     msg = {1, 2, 12};
+    sxs::println("okkk");
 
     ////    auto _mappings = OpaqueMapping{};
     //    auto _mappings = std::make_shared<OpaqueMapping>();
@@ -85,8 +84,24 @@ void Message::send(zmq::send_flags send_flags)
     //    (*_mappings)["q"] = true;
     //
     msg["ha"] = "ok";
-    msg["ha"] = msg.Mapping();
-    msg["ha"] = msg.container("haha");
+    //    msg["ha"] = msg.Mapping();
+    msg["ha"] = msg.OpaqueItem("haha");
+
+    std::vector<float> ianiine = {55};
+    msg["ha"] = msg.AnyList(
+        "haha", 1, 2, "{3,2,34,2}", 32.23, std::vector<int>{1, 3, 2},
+        msg.Mapping("hah"_kw = "ok", "lol"_kw = {1, 55}, "ianiine"_kw = ianiine, "any"_kw = msg.AnyList("ah", 234)));
+
+    auto ndarray_builder = msgBuilder_.initRoot<msgx::type::NdArray<capnp::List<msgx::type::Item>>>();
+
+    msg = msg.Mapping("hah"_kw = "ok", "lol"_kw = {1, 55}, "ianiine"_kw = ianiine, "any"_kw = msg.AnyList("ah", 234));
+
+    msg.send();
+
+    //         anylist_builder.initBuffer(5);
+
+    return;
+
     //
     //    auto ha = msg.lolHAHAcontainer();
 
@@ -111,11 +126,13 @@ void Message::send(zmq::send_flags send_flags)
 
     msg.send();
 
-    msg.container("ha");
+    msg.OpaqueItem("ha");
 
     std::function<capnp::Orphanage(void)> getter = [this]() { return msgBuilder_.getOrphanage(); };
 
     auto mappings = OpaqueMapping{getter};
+
+    auto &mapping2 = mappings;
 
     //    msgBuilder_.getOrphanage();
 
@@ -125,7 +142,7 @@ void Message::send(zmq::send_flags send_flags)
     std::vector<dtype> isren = {1, 2, 5, 332, 2323};
     //
 
-    mappings["true"] = msg.container("isren");
+    mappings["true"] = msg.OpaqueItem("isren");
 
     mappings["okok bye"] = isren;
     mappings["_"] = isren;

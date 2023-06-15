@@ -12,6 +12,18 @@ class OpaqueItem
 public:
     explicit OpaqueItem(OrphanageGetter get_orphanage_functor = nullptr);
 
+    // non-copyable
+    OpaqueItem(const OpaqueItem &) = delete;
+
+    OpaqueItem &operator=(const OpaqueItem &) = delete;
+
+    // move constructor
+    OpaqueItem(OpaqueItem &&other) noexcept : get_orphanage_functor_(other.get_orphanage_functor_)
+    {
+    }
+
+    virtual ~OpaqueItem() = default;
+
     virtual void build(OpaqueItemBuilder builder) = 0;
 
     bool has_orphanage() const;
@@ -21,5 +33,6 @@ protected:
 };
 
 using OpaqueItemPtr = std::unique_ptr<OpaqueItem>;
+using OpaqueItemSharedPtr = std::shared_ptr<OpaqueItem>;
 
 }  // namespace msgx

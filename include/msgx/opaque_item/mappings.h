@@ -58,7 +58,7 @@ protected:
     };
 
 public:
-    void build(msgx::type::Item::Oneof::Builder builder) override;
+    void build(OpaqueItemBuilder builder) override;
 
     IndexAccessProxy operator[](const std::string &key);
 
