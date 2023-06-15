@@ -1,17 +1,11 @@
 #include <capnp/compat/std-iterator.h>
 #include <capnp/message.h>
 #include <capnp/serialize-packed.h>
-
-#include "msgx/message.h"
-
-// #include "_impl/core.hpp"
-
 #include <soraxas_toolbox/print_utils.h>
 
-#include "message.h"
-#include "msgx.capnp.h"
 #include "msgx/comms/zmq.h"
 #include "msgx/kwargs.h"
+#include "msgx/message.h"
 
 using namespace msgx::kwargs;
 

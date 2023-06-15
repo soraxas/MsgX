@@ -12,7 +12,7 @@ namespace msgx
 namespace comms
 {
 
-class Zmq : public Comms
+class Zmq
 {
 public:
     /**
@@ -38,7 +38,7 @@ public:
         get_instance().send(std::forward<Args>(args)...);
     }
 
-    void send(capnp::MallocMessageBuilder &msg_builder) override
+    void send(capnp::MallocMessageBuilder &msg_builder)
     {
         zmq::send_flags send_flags = zmq::send_flags::dontwait;
         auto wordArray = capnp::messageToFlatArray(msg_builder);
@@ -60,7 +60,7 @@ public:
 protected:
     explicit Zmq(size_t sleep_after_bind = 1000) : context_(), publisher_(context_, ZMQ_PUB)
     {
-        publisher_.bind(remote_address());
+        publisher_.bind(::msgx::comms::remote_address());
         if (sleep_after_bind > 0)
             std::this_thread::sleep_for(std::chrono::milliseconds(sleep_after_bind));
     }

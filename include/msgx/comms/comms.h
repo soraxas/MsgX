@@ -10,18 +10,11 @@ namespace msgx
 
 namespace comms
 {
-
-class Comms
+std::string &remote_address()
 {
-public:
-    static std::string &remote_address()
-    {
-        static std::string addr = "tcp://127.0.0.1:5557";
-        return addr;
-    }
-
-    virtual void send(capnp::MallocMessageBuilder &) = 0;
-};
+    static std::string addr = "tcp://127.0.0.1:5558";
+    return addr;
+}
 
 }  // namespace comms
 

@@ -5,27 +5,29 @@ message(include_directories (${CMAKE_SOURCE_DIR}/include)
 
 set(SOURCE_FILES main.cpp opaque_item/mappings.cpp opaque_item/item.cpp
                  opaque_item/bindable_item.cpp)
-set(HEADER_FILES ${CAPNP_HEADER})
-set(LINK_LIBARARIES CapnProto::capnp ${CAPNP_LIBRARIES} zmq ${ZMQ_LIBRARIES}
-                    msgx_capnp)
+set(HEADER_FILES ${CAPNP_HEADER} ../../include/msgx/message.h)
+set(PUBLIC_LINK_LIBARARIES CapnProto::capnp ${CAPNP_LIBRARIES} msgx_capnp)
+set(PRIVATE_LINK_LIBARARIES zmq ${ZMQ_LIBRARIES} msgx_capnp spdlog::spdlog)
 
 # target_link_libraries(${PROJECT_NAME} )
 # target_include_directories(${PROJECT_NAME} PRIVATE
 # ${CMAKE_CURRENT_BINARY_DIR})
 
 # Build library
-add_library(msgx ${SOURCE_FILES})
-target_link_libraries(msgx PUBLIC ${LINK_LIBARARIES})
-target_link_libraries(msgx PUBLIC spdlog::spdlog)
+add_library(msgx ${SOURCE_FILES} ${HEADER_FILES})
+target_link_libraries(msgx PUBLIC ${PUBLIC_LINK_LIBARARIES})
+target_link_libraries(msgx PRIVATE ${PUBLIC_LINK_LIBARARIES})
 
 target_include_directories(
   msgx PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
               $<INSTALL_INTERFACE:> <prefix>/include/msgx)
 
+target_include_directories(msgx PUBLIC ../../include)
+
 # Installation setup
 set_target_properties(
   msgx PROPERTIES PUBLIC_HEADER "${HEADER_FILES}"
-                  IMPORTED_LINK_DEPENDENT_LIBRARIES "${LINK_LIBARARIES}")
+                  IMPORTED_LINK_DEPENDENT_LIBRARIES "${PUBLIC_LINK_LIBARARIES}")
 
 install(
   TARGETS msgx
