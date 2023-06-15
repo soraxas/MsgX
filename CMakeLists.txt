@@ -3,35 +3,6 @@ project(MsgX CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CPM_USE_LOCAL_PACKAGES ON)
-# add dependencies
-include(cmake/CPM.cmake)
-
-# CapnProto depends on some exported variables, (and CPM does not export them due to function scope)
-# so we will need to use find_package as a workaround
-find_package(CapnProto QUIET)
-if(NOT CapnProto_FOUND)
-  CPMFindPackage("gh:capnproto/capnproto@0.10.3")
-
-  # Maintain build compatibility between find_package and CMakeLists.txt variants
-  set(CAPNPROTO_LIBRARIES CapnProto)
-endif()
-
-
-# find_package(cppzmq QUIET)
-# find_package(Protobuf REQUIRED) find_package(CapnProto)
-
-# set(CapnProto_DIR )
-
-# find_package(CapnProto REQUIRED) find_package(CapnProto )
-# include_directories(${CAPNP_INCLUDE_DIRS})
-# add_definitions(${CAPNP_DEFINITIONS})
-
-# Set output directories for libraries and executables set(BASE_DIR
-# ${CMAKE_SOURCE_DIR}) set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BASE_DIR}/lib)
-# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BASE_DIR}/bin) set(PYTHON_PKG_INSTALL_DIR
-# ${BASE_DIR}/built_python_pkg)
-
 # Installation locations
 set(INSTALL_LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib)
 set(INSTALL_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/msgx)
@@ -41,11 +12,30 @@ set(INSTALL_CMAKE_DIR ${CMAKE_INSTALL_PREFIX}/lib/cmake/msgx)
 # | Build configuration options
 # +-----------------------------------------------------------------------------
 option(BUILD_CTAGS "Build ctag file?" FALSE)
-option(RUN_TESTS "Run Tests?" FALSE)
+option(BUILD_TESTS "Run Tests?" FALSE)
 
 # +-----------------------------------------------------------------------------
 # | Library search and setup
 # +-----------------------------------------------------------------------------
+
+set(CPM_USE_LOCAL_PACKAGES ON)
+# set(CPM_LOCAL_PACKAGES_ONLY ON) add dependencies
+include(cmake/CPM.cmake)
+
+# CapnProto depends on some exported variables, (and CPM does not export them
+# due to function scope) so we will need to use find_package as a workaround
+find_package(CapnProto QUIET)
+if(NOT CapnProto_FOUND)
+  cpmfindpackage("gh:capnproto/capnproto@0.10.3")
+
+  # Maintain build compatibility between find_package and CMakeLists.txt
+  # variants
+  set(CAPNPROTO_LIBRARIES CapnProto)
+endif()
+
+cpmaddpackage("gh:gabime/spdlog@1.2.0")
+
+# find_package(cppzmq QUIET)
 
 # Build shared libraries by default set(BUILD_SHARED_LIBS True)
 
@@ -80,8 +70,7 @@ include_directories(include)
 
 add_subdirectory(src)
 
-# add_executable(test main.c++)
-# target_link_libraries(test msgx)
+# add_executable(test main.c++) target_link_libraries(test msgx)
 # target_link_libraries(test msgx)
 
 # python scripts add_custom_target( copy-python-pkg-template ALL COMMAND
@@ -106,30 +95,34 @@ add_subdirectory(src)
 
 # Export the package for use from the build tree. This registers the build tree
 # with a global CMake registry. export(PACKAGE ${PROJECT_NAME})
-#
+
 # Determine the relative path between CMake configuration file installation
 # location and header files installation directory file(RELATIVE_PATH
 # REL_INCLUDE_DIR ${INSTALL_CMAKE_DIR} ${INSTALL_INCLUDE_DIR})
-#
+
 # Create the ${ProjectName}Config.cmake file for the build tree.
-# set(CONF_INCLUDE_DIRS ${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
-# configure_file(${PROJECT_NAME}Config.cmake.in
-# "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake" @ONLY)
-#
+set(CONF_INCLUDE_DIRS ${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
+configure_file(${PROJECT_NAME}Config.cmake.in
+               "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake" @ONLY)
+
 # Create the ${PROJECT_NAME}Config.cmake file for the install tree.
-# set(CONF_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include) configure_file(
-# ${PROJECT_NAME}Config.cmake.in
-# "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
-# @ONLY)
-#
-# Install the ${PROJECT_NAME}Config.cmake file install( FILES
-# "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
-# DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
-#
+set(CONF_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include)
+configure_file(
+  ${PROJECT_NAME}Config.cmake.in
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
+  @ONLY)
+
+# Install the ${PROJECT_NAME}Config.cmake file
+install(
+  FILES
+    "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
+  DESTINATION "${INSTALL_CMAKE_DIR}"
+  COMPONENT dev)
+
 # Install the export set for use with the install tree install( EXPORT
-# ${PROJECT_NAME}Targets #  EXPORT ${PROJECT_NAME}Targets DESTINATION
+# ${PROJECT_NAME}Targets EXPORT ${PROJECT_NAME}Targets DESTINATION
 # "${INSTALL_CMAKE_DIR}" COMPONENT dev)
 
-if(${RUN_TESTS})
+if(${BUILD_TESTS})
   add_subdirectory(tests)
 endif()

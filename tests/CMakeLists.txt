@@ -1,7 +1,7 @@
-CPMAddPackage("gh:doctest/doctest@2.4.11")
+cpmaddpackage("gh:doctest/doctest@2.4.11")
 
 # format code
-CPMAddPackage("gh:TheLartians/Format.cmake@1.7.3")
+cpmaddpackage("gh:TheLartians/Format.cmake@1.7.3")
 
 add_executable(msgx_test msgx_test.c++)
 
