@@ -4,68 +4,68 @@
 
 namespace msgx
 {
-namespace conversion
+namespace detail
 {
 template <typename DataType>
-constexpr auto NdArrayAdoptOrphanDispatcher()
+constexpr auto NdListAdoptOrphanDispatcher()
 {
     std::terminate();
 }
 
 template <>
-constexpr auto NdArrayAdoptOrphanDispatcher<double_t>()
+constexpr auto NdListAdoptOrphanDispatcher<double_t>()
 {
-    return &msgx::type::Item::Oneof::Builder::adoptDoubleArray;
+    return &msgx::type::Item::Oneof::Builder::adoptDoubleList;
 };
 
 template <>
-constexpr auto NdArrayAdoptOrphanDispatcher<float_t>()
+constexpr auto NdListAdoptOrphanDispatcher<float_t>()
 {
-    return &msgx::type::Item::Oneof::Builder::adoptFloatArray;
+    return &msgx::type::Item::Oneof::Builder::adoptFloatList;
 };
 
 template <>
-constexpr auto NdArrayAdoptOrphanDispatcher<int32_t>()
+constexpr auto NdListAdoptOrphanDispatcher<int32_t>()
 {
-    return &msgx::type::Item::Oneof::Builder::adoptIntArray;
+    return &msgx::type::Item::Oneof::Builder::adoptIntList;
 };
 
 template <>
-constexpr auto NdArrayAdoptOrphanDispatcher<int64_t>()
+constexpr auto NdListAdoptOrphanDispatcher<int64_t>()
 {
-    return &msgx::type::Item::Oneof::Builder::adoptLongArray;
+    return &msgx::type::Item::Oneof::Builder::adoptLongList;
 };
 
 template <>
-constexpr auto NdArrayAdoptOrphanDispatcher<bool>()
+constexpr auto NdListAdoptOrphanDispatcher<bool>()
 {
-    return &msgx::type::Item::Oneof::Builder::adoptBoolArray;
+    return &msgx::type::Item::Oneof::Builder::adoptBoolList;
 };
 
 template <>
-constexpr auto NdArrayAdoptOrphanDispatcher<std::string>()
+constexpr auto NdListAdoptOrphanDispatcher<std::string>()
 {
-    return &msgx::type::Item::Oneof::Builder::adoptStringArray;
+    return &msgx::type::Item::Oneof::Builder::adoptStringList;
 };
 
 template <>
-constexpr auto NdArrayAdoptOrphanDispatcher<msgx::type::Item>()
+constexpr auto NdListAdoptOrphanDispatcher<msgx::type::Item>()
 {
-    return &msgx::type::Item::Oneof::Builder::adoptAnyArray;
+    return &msgx::type::Item::Oneof::Builder::adoptAnyList;
 };
 
 ////////////////////////////////////////////////////////////
 
 template <typename T, typename std::enable_if<std::is_same<T, float_t>::value, int>::type * = nullptr>
-constexpr auto NdArrayInitArrayDispatcher()
+constexpr auto InitListDispatcher()
 {
-    return &msgx::type::Item::Oneof::Builder::initFloatArray;
+    return &msgx::type::Item::Oneof::Builder::initFloatList;
 }
 
 template <typename T, typename std::enable_if<std::is_same<T, double_t>::value, int>::type * = nullptr>
-constexpr auto NdArrayInitArrayDispatcher()
+constexpr auto InitListDispatcher()
 {
-    return &msgx::type::Item::Oneof::Builder::initDoubleArray;
+    return &msgx::type::Item::Oneof::Builder::initDoubleList;
 }
 
 template <typename T, typename std::enable_if<std::is_same<T, uint8_t>::value ||   //
@@ -73,39 +73,39 @@ template <typename T, typename std::enable_if<std::is_same<T, uint8_t>::value ||
                                               std::is_same<T, int8_t>::value ||    //
                                               std::is_same<T, int16_t>::value ||   //
                                               std::is_same<T, int32_t>::value>::type * = nullptr>
-constexpr auto NdArrayInitArrayDispatcher()
+constexpr auto InitListDispatcher()
 {
-    return &msgx::type::Item::Oneof::Builder::initIntArray;
+    return &msgx::type::Item::Oneof::Builder::initIntList;
 }
 
 template <typename T, typename std::enable_if<std::is_same<T, uint32_t>::value ||  //
                                               std::is_same<T, uint64_t>::value ||  // lossy
                                               std::is_same<T, int64_t>::value>::type * = nullptr>
-constexpr auto NdArrayInitArrayDispatcher()
+constexpr auto InitListDispatcher()
 {
-    return &msgx::type::Item::Oneof::Builder::initLongArray;
+    return &msgx::type::Item::Oneof::Builder::initLongList;
 }
 
 template <typename T, typename std::enable_if<std::is_same<T, bool>::value, int>::type * = nullptr>
-constexpr auto NdArrayInitArrayDispatcher()
+constexpr auto InitListDispatcher()
 {
-    return &msgx::type::Item::Oneof::Builder::initBoolArray;
+    return &msgx::type::Item::Oneof::Builder::initBoolList;
 }
 
 template <typename T, typename std::enable_if<std::is_same<T, const char *>::value ||  //
                                               std::is_same<T, std::string>::value>::type * = nullptr>
-constexpr auto NdArrayInitArrayDispatcher()
+constexpr auto InitListDispatcher()
 {
-    return &msgx::type::Item::Oneof::Builder::initStringArray;
+    return &msgx::type::Item::Oneof::Builder::initStringList;
 }
 
 template <typename T, typename std::enable_if<std::is_same<T, msgx::type::Item>::value, int>::type * = nullptr>
-constexpr auto NdArrayInitArrayDispatcher()
+constexpr auto InitListDispatcher()
 {
-    return &msgx::type::Item::Oneof::Builder::initAnyArray;
+    return &msgx::type::Item::Oneof::Builder::initAnyList;
 }
 
 ////////////////////////////////////////////////////////////
 
-}  // namespace conversion
+}  // namespace detail
 }  // namespace msgx

@@ -2,19 +2,7 @@
 using Cxx = import "/capnp/c++.capnp";
 $Cxx.namespace("msgx::type");
 
-#using Math = import "math.capnp";
-
-struct NdArray(DataType) {
-    buffer                 @0: DataType;
-
-    union {
-        oneDimensional     @1: Void;
-        multiDimensional :group {
-            columnMajor    @2: Bool;
-            shape          @3: List(UInt32);
-        }
-    }
-}
+using NdArray = import "ndarray.capnp";
 
 struct NamedBinary {
     description            @0 :Text;
@@ -52,15 +40,17 @@ struct Item {
         binary             @13 :Data;
         namedBinary        @14 :NamedBinary;
 
-        boolArray          @15 :NdArray(List(Bool));
-        intArray           @16 :NdArray(List(Int32));
-        longArray          @17 :NdArray(List(Int64));
-        floatArray         @18 :NdArray(List(Float32));
-        doubleArray        @19 :NdArray(List(Float64));
-        stringArray        @20 :NdArray(List(Text));
-        anyArray           @21 :NdArray(List(Item));
+        boolList           @15 :List(Bool);
+        intList            @16 :List(Int32);
+        longList           @17 :List(Int64);
+        floatList          @18 :List(Float32);
+        doubleList         @19 :List(Float64);
+        stringList         @20 :List(Text);
+        anyList            @21 :List(Item);
 
-        mapping            @22 :Map(Text, Item);
+        ndArray            @22 :NdArray.NdArray;
+
+        mapping            @23 :Map(Text, Item);
     }
 }
 

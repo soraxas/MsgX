@@ -3,6 +3,8 @@
 #include <sstream>
 #include <vector>
 
+#include "msgx.capnp.h"
+#include "msgx/device_specifics.h"
 #include "msgx/opaque_item/bindable_item.h"
 
 namespace msgx
@@ -75,5 +77,22 @@ ListBuilder build_capnp_list(ListBuilder builder, const std::vector<T> &values)
         builder.set(i, values[i]);
     return builder;
 }
+
+constexpr auto get_device_specific_endian()
+{
+    if (::msgx::helpers::Endian::little)
+        return ::msgx::type::ndarray::Endianness::LITTLE_ENDIAN_ORDER;
+    else if (::msgx::helpers::Endian::big)
+        return ::msgx::type::ndarray::Endianness::BIG_ENDIAN_ORDER;
+    else if (::msgx::helpers::Endian::middle)
+        return ::msgx::type::ndarray::Endianness::BIG_ENDIAN_ORDER;
+}
+
+template <typename T>
+using enable_if_is_numeric_t = typename std::enable_if<std::is_arithmetic<T>::value, T>::type;
+
+template <typename T>
+using disable_if_is_numeric_t = typename std::enable_if<!std::is_arithmetic<T>::value, T>::type;
+
 }  // namespace helpers
 }  // namespace msgx

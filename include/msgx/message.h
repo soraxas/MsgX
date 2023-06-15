@@ -131,9 +131,8 @@ public:
         //        auto anyitem_list = orphanage_getter_().newOrphan<capnp::List<msgx::type::Item>>();
 
         auto item_orphan = orphanage_getter_().newOrphan<msgx::type::Item::Oneof>();
-        auto anylist = item_orphan.get().initAnyArray();
+        auto anylist_builder = item_orphan.get().initAnyList(container.size());
         //
-        auto anylist_builder = anylist.initBuffer(container.size());
         for (size_t i = 0; i < container.size(); ++i)
         {
             auto orphan = orphanage_getter_().newOrphan<msgx::type::Item>();

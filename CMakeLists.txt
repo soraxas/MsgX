@@ -26,14 +26,14 @@ include(cmake/CPM.cmake)
 # due to function scope) so we will need to use find_package as a workaround
 find_package(CapnProto QUIET)
 if(NOT CapnProto_FOUND)
-  CPMAddPackage("gh:capnproto/capnproto@0.10.3")
+  cpmaddpackage("gh:capnproto/capnproto@0.10.3")
 
   # Maintain build compatibility between find_package and CMakeLists.txt
   # variants
   set(CAPNPROTO_LIBRARIES CapnProto)
 endif()
 
-CPMAddPackage("gh:gabime/spdlog@1.2.0")
+cpmaddpackage("gh:gabime/spdlog@1.2.0")
 
 # find_package(cppzmq QUIET)
 
@@ -70,8 +70,8 @@ include_directories(include)
 
 add_subdirectory(src)
 
-# add_executable(test main.c++) target_link_libraries(test msgx)
-# target_link_libraries(test msgx)
+add_executable(test main.c++)
+target_link_libraries(test msgx spdlog::spdlog)
 
 # python scripts add_custom_target( copy-python-pkg-template ALL COMMAND
 # ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/scripts
@@ -123,6 +123,6 @@ install(
 # ${PROJECT_NAME}Targets EXPORT ${PROJECT_NAME}Targets DESTINATION
 # "${INSTALL_CMAKE_DIR}" COMPONENT dev)
 
-if(${BUILD_TESTS})
-  add_subdirectory(tests)
-endif()
+# if (${BUILD_TESTS})
+add_subdirectory(tests)
+# endif ()

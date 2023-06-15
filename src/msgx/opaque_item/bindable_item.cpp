@@ -1,5 +1,7 @@
 #include "msgx/opaque_item/bindable_item.h"
 
+#include "msgx/conversion/common.h"
+
 namespace msgx
 {
 
@@ -23,30 +25,32 @@ void BindableOpaqueItem::build(OpaqueItemBuilder builder)
             case Item::Oneof::U_LONG:
             case Item::Oneof::FLOAT:
             case Item::Oneof::DOUBLE:
-                throw std::runtime_error("directly set as primitive instead!");
-            case Item::Oneof::INT_ARRAY:
-                builder.adoptIntArray(orphan_.get().disownIntArray());
+                throw std::runtime_error(helpers::StringStreamer()
+                                         << "An orphan is given with primitive type " << orphan_.get().which()
+                                         << ". You should directly set the primitive value instead!");
+            case Item::Oneof::INT_LIST:
+                builder.adoptIntList(orphan_.get().disownIntList());
                 break;
             case Item::Oneof::STRING:
                 builder.adoptString(orphan_.get().disownString());
                 break;
-            case Item::Oneof::BOOL_ARRAY:
-                builder.adoptBoolArray(orphan_.get().disownBoolArray());
+            case Item::Oneof::BOOL_LIST:
+                builder.adoptBoolList(orphan_.get().disownBoolList());
                 break;
-            case Item::Oneof::LONG_ARRAY:
-                builder.adoptLongArray(orphan_.get().disownLongArray());
+            case Item::Oneof::LONG_LIST:
+                builder.adoptLongList(orphan_.get().disownLongList());
                 break;
-            case Item::Oneof::FLOAT_ARRAY:
-                builder.adoptFloatArray(orphan_.get().disownFloatArray());
+            case Item::Oneof::FLOAT_LIST:
+                builder.adoptFloatList(orphan_.get().disownFloatList());
                 break;
-            case Item::Oneof::DOUBLE_ARRAY:
-                builder.adoptDoubleArray(orphan_.get().disownDoubleArray());
+            case Item::Oneof::DOUBLE_LIST:
+                builder.adoptDoubleList(orphan_.get().disownDoubleList());
                 break;
-            case Item::Oneof::STRING_ARRAY:
-                builder.adoptStringArray(orphan_.get().disownStringArray());
+            case Item::Oneof::STRING_LIST:
+                builder.adoptStringList(orphan_.get().disownStringList());
                 break;
-            case Item::Oneof::ANY_ARRAY:
-                builder.adoptAnyArray(orphan_.get().disownAnyArray());
+            case Item::Oneof::ANY_LIST:
+                builder.adoptAnyList(orphan_.get().disownAnyList());
                 break;
             case Item::Oneof::MAPPING:
                 builder.adoptMapping(orphan_.get().disownMapping());
@@ -56,6 +60,9 @@ void BindableOpaqueItem::build(OpaqueItemBuilder builder)
                 break;
             case Item::Oneof::NAMED_BINARY:
                 builder.adoptNamedBinary(orphan_.get().disownNamedBinary());
+                break;
+            case Item::Oneof::ND_ARRAY:
+                builder.adoptNdArray(orphan_.get().disownNdArray());
                 break;
             default:
                 SPDLOG_ERROR("unimplemented message for which enum: {}", orphan_.get().which());
