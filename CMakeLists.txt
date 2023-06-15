@@ -26,14 +26,14 @@ include(cmake/CPM.cmake)
 # due to function scope) so we will need to use find_package as a workaround
 find_package(CapnProto QUIET)
 if(NOT CapnProto_FOUND)
-  cpmfindpackage("gh:capnproto/capnproto@0.10.3")
+  CPMAddPackage("gh:capnproto/capnproto@0.10.3")
 
   # Maintain build compatibility between find_package and CMakeLists.txt
   # variants
   set(CAPNPROTO_LIBRARIES CapnProto)
 endif()
 
-cpmaddpackage("gh:gabime/spdlog@1.2.0")
+CPMAddPackage("gh:gabime/spdlog@1.2.0")
 
 # find_package(cppzmq QUIET)
 
