@@ -51,7 +51,7 @@ if(BUILD_CTAGS)
   add_custom_target(
     generate_ctags ALL
     ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .
-    WORKING_DIRECTORY ${BASE_DIR}/src
+    WORKING_DIRECTORY ${BASE_DIR}/c++
     COMMENT "Regenerating ctags file")
 endif()
 
@@ -68,7 +68,7 @@ endif()
 
 include_directories(include)
 
-add_subdirectory(src)
+add_subdirectory(c++)
 
 add_executable(test main.c++)
 target_link_libraries(test msgx spdlog::spdlog)

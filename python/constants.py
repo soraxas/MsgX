@@ -1,6 +1,9 @@
 import numpy as np
-import capnp
-from msgx_capnp.ndarray_capnp import Endianness, DataType
+
+from . import msg_definitions
+
+Endianness = msg_definitions.ndarray_capnp.Endianness
+DataType = msg_definitions.ndarray_capnp.DataType
 
 ENDIANNESS_MAPPING = {
     Endianness.littleEndianOrder: "little",

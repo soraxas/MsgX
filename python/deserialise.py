@@ -1,47 +1,48 @@
 import numpy as np
 
-import capnp
-from msgx_capnp.msgx_capnp import Item
-
 from sys import byteorder as BYTE_ORDER
-from constants import ENDIANNESS_MAPPING, DATATYPE_MAPPING
 from collections import namedtuple
+
+from .msg_definitions import msgx_capnp
+from .constants import ENDIANNESS_MAPPING, DATATYPE_MAPPING
 
 
 NamedBinary = namedtuple("NamedBinary", "description bytes")
 
+Oneof = msgx_capnp.Item.Oneof
+
 DECODE_MAPPING = {
     # primitives
-    Item.Oneof.null.value: lambda x: None,
-    Item.Oneof.bool.value: lambda x: x.bool,
-    Item.Oneof.uChar.value: lambda x: x.uChar,
-    Item.Oneof.uInt.value: lambda x: x.uInt,
-    Item.Oneof.uLong.value: lambda x: x.uLong,
-    Item.Oneof.uShort.value: lambda x: x.uShort,
-    Item.Oneof.char.value: lambda x: x.char,
-    Item.Oneof.short.value: lambda x: x.short,
-    Item.Oneof.int.value: lambda x: x.int,
-    Item.Oneof.long.value: lambda x: x.long,
-    Item.Oneof.float.value: lambda x: x.float,
-    Item.Oneof.double.value: lambda x: x.double,
+    Oneof.null.value: lambda x: None,
+    Oneof.bool.value: lambda x: x.bool,
+    Oneof.uChar.value: lambda x: x.uChar,
+    Oneof.uInt.value: lambda x: x.uInt,
+    Oneof.uLong.value: lambda x: x.uLong,
+    Oneof.uShort.value: lambda x: x.uShort,
+    Oneof.char.value: lambda x: x.char,
+    Oneof.short.value: lambda x: x.short,
+    Oneof.int.value: lambda x: x.int,
+    Oneof.long.value: lambda x: x.long,
+    Oneof.float.value: lambda x: x.float,
+    Oneof.double.value: lambda x: x.double,
     # basic pointer type
-    Item.Oneof.string.value: lambda x: x.string,
-    Item.Oneof.binary.value: lambda x: x.binary,
-    Item.Oneof.namedBinary.value: lambda x: NamedBinary(
+    Oneof.string.value: lambda x: x.string,
+    Oneof.binary.value: lambda x: x.binary,
+    Oneof.namedBinary.value: lambda x: NamedBinary(
         x.namedBinary.description, x.namedBinary.bytes
     ),
     # list of pointers (trivial)
-    Item.Oneof.boolList.value: lambda x: x.boolList,
-    Item.Oneof.intList.value: lambda x: x.intList,
-    Item.Oneof.longList.value: lambda x: x.longList,
-    Item.Oneof.floatList.value: lambda x: x.floatList,
-    Item.Oneof.doubleList.value: lambda x: x.doubleList,
-    Item.Oneof.stringList.value: lambda x: x.stringList,
+    Oneof.boolList.value: lambda x: x.boolList,
+    Oneof.intList.value: lambda x: x.intList,
+    Oneof.longList.value: lambda x: x.longList,
+    Oneof.floatList.value: lambda x: x.floatList,
+    Oneof.doubleList.value: lambda x: x.doubleList,
+    Oneof.stringList.value: lambda x: x.stringList,
     # list of pointers
-    Item.Oneof.anyList.value: lambda x: decode_list(x.anyList),
-    Item.Oneof.mapping.value: lambda x: decode_mapping(x.mapping),
+    Oneof.anyList.value: lambda x: decode_list(x.anyList),
+    Oneof.mapping.value: lambda x: decode_mapping(x.mapping),
     # ndarray with binary buffer
-    Item.Oneof.ndArray.value: lambda x: decode_ndarray(x.ndArray),
+    Oneof.ndArray.value: lambda x: decode_ndarray(x.ndArray),
 }
 
 
@@ -85,5 +86,5 @@ def decode_item(opaque_item):
 
 
 def decode_message(byte_string):
-    with Item.from_bytes(byte_string) as opaque_item:
+    with msgx_capnp.Item.from_bytes(byte_string) as opaque_item:
         return decode_item(opaque_item)

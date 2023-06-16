@@ -1,8 +1,9 @@
 import time
-
-import deserialise
-
 import zmq
+
+from ._version import __version__
+from . import deserialise
+
 
 MSGX_ADDRESS = "tcp://127.0.0.1:5558"
 MSGX_MODE_DEFAULT = "default"
@@ -57,9 +58,16 @@ class MsgXReceiver:
         return (await self.get_msg_async_func())()
 
 
-if __name__ == "__main__":
+def spin_default():
     receiver = MsgXReceiver()
     print("===== looping printing all received message in background =====")
-    while True:
-        print(receiver.get_msg())
-        print("----------------------------------------------------------")
+    try:
+        while True:
+            print(receiver.get_msg())
+            print("----------------------------------------------------------")
+    except KeyboardInterrupt:
+        exit(0)
+
+
+if __name__ == "__main__":
+    spin_default()
