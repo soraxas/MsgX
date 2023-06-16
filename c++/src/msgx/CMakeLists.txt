@@ -3,8 +3,8 @@
 message(include_directories (${CMAKE_SOURCE_DIR}/include)
         okok${CAPNP_INCLUDE_DIRS}haie)
 
-set(SOURCE_FILES opaque_item/mappings.cpp opaque_item/item.cpp
-                 opaque_item/bindable_item.cpp)
+set(SOURCE_FILES opaque_item/mappings.c++ opaque_item/item.c++
+                 opaque_item/bindable_item.c++)
 set(HEADER_FILES ${CAPNP_HEADER} ../../include/msgx/message.h)
 set(PUBLIC_LINK_LIBARARIES CapnProto::capnp ${CAPNP_LIBRARIES} msgx_capnp zmq
                            ${ZMQ_LIBRARIES})

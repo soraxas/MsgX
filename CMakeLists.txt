@@ -66,9 +66,9 @@ endif()
 # | Compile code
 # +-----------------------------------------------------------------------------
 
-include_directories(include)
+include_directories(c++/include)
 
-add_subdirectory(c++)
+add_subdirectory(c++/src)
 
 add_executable(test main.c++)
 target_link_libraries(test msgx spdlog::spdlog)
