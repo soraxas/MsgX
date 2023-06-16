@@ -25,8 +25,7 @@ version_str = mo.group(1)
 src_glob = glob.glob(
     os.path.join(this_directory, "c++", "src", "msgx_capnp", "*.capnp")
 )
-print(src_glob)
-dst_dir = os.path.join(this_directory, "python", "msgx")
+dst_dir = os.path.join(this_directory, "python")
 for file in src_glob:
     print("copying {} -> {}".format(file, dst_dir))
     shutil.copy(file, dst_dir)

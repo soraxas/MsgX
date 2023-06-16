@@ -1,1 +1,1 @@
-recursive-include python/msgx *.capnp
+recursive-include python *.capnp
