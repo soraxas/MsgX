@@ -1,11 +1,10 @@
 import numpy as np
 
-from sys import byteorder as BYTE_ORDER
+from sys import byteorder
 from collections import namedtuple
 
 from .msg_definitions import msgx_capnp
 from .constants import ENDIANNESS_MAPPING, DATATYPE_MAPPING
-
 
 NamedBinary = namedtuple("NamedBinary", "description bytes")
 
@@ -47,10 +46,12 @@ DECODE_MAPPING = {
 
 
 def decode_not_implemented(item_oneof):
+    """Default decode function for things that are not implemented."""
     raise NotImplementedError(f"Item is not implemented: {item_oneof}")
 
 
 def decode_mapping(value):
+    """Decode function for nest mapping type."""
     _dict = dict()
     for entry in value.entries:
         if entry.key in _dict:
@@ -63,14 +64,16 @@ def decode_mapping(value):
 
 
 def decode_list(value):
+    """Decode function for nested list type."""
     return [decode_item(val) for val in value]
 
 
 def decode_ndarray(value):
-    if ENDIANNESS_MAPPING[value.endianness.raw] != BYTE_ORDER:
+    """Decode function for packed numeric type."""
+    if ENDIANNESS_MAPPING[value.endianness.raw] != byteorder:
         raise RuntimeError(
             f"Endinness are different! Received an ndarray message with "
-            f"endianness of {value.endianness}, but this system has {BYTE_ORDER} endian."
+            f"endianness of {value.endianness}, but this machin has {byteorder} endian."
         )
 
     array = np.frombuffer(value.buffer, dtype=DATATYPE_MAPPING[value.dtype.raw])
@@ -81,10 +84,12 @@ def decode_ndarray(value):
 
 
 def decode_item(opaque_item):
+    """Decode function for opaque item type."""
     _oneof = opaque_item.oneof
     return DECODE_MAPPING[_oneof.which.raw](_oneof)
 
 
 def decode_message(byte_string):
+    """The entry function to transform a byte string into python native objects."""
     with msgx_capnp.Item.from_bytes(byte_string) as opaque_item:
         return decode_item(opaque_item)

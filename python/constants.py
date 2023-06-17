@@ -5,12 +5,14 @@ from . import msg_definitions
 Endianness = msg_definitions.ndarray_capnp.Endianness
 DataType = msg_definitions.ndarray_capnp.DataType
 
+# enum endian-ness type
 ENDIANNESS_MAPPING = {
     Endianness.littleEndianOrder: "little",
     Endianness.bigEndianOrder: "big",
     Endianness.middleEndianOrder: None,
 }
 
+# enum ndarray data type
 DATATYPE_MAPPING = {
     DataType.bool8: np.bool8,  # bool
     # signed
