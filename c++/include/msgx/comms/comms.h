@@ -10,7 +10,8 @@ namespace msgx
 
 namespace comms
 {
-std::string &remote_address()
+
+inline std::string &remote_address()
 {
     static std::string addr = "tcp://127.0.0.1:5558";
     return addr;

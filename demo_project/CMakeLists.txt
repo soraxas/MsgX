@@ -8,7 +8,8 @@ include(../cmake/BuildExternalDependencies.cmake)
 
 add_subdirectory(
   # you can replace the following with the cloned absolute path for this repo
-  .. plotmsg)
+  .. plotmsg
+)
 find_package(plotmsg REQUIRED)
 
 add_executable(test "src/main.cpp")

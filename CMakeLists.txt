@@ -25,13 +25,13 @@ include(cmake/CPM.cmake)
 # CapnProto depends on some exported variables, (and CPM does not export them
 # due to function scope) so we will need to use find_package as a workaround
 find_package(CapnProto QUIET)
-if(NOT CapnProto_FOUND)
+if (NOT CapnProto_FOUND)
   cpmaddpackage("gh:capnproto/capnproto@0.10.3")
 
   # Maintain build compatibility between find_package and CMakeLists.txt
   # variants
   set(CAPNPROTO_LIBRARIES CapnProto)
-endif()
+endif ()
 
 cpmaddpackage("gh:gabime/spdlog@1.2.0")
 
@@ -46,14 +46,15 @@ cpmaddpackage("gh:gabime/spdlog@1.2.0")
 # | Custom targets and macros
 # +-----------------------------------------------------------------------------
 
-if(BUILD_CTAGS)
+if (BUILD_CTAGS)
   # Custom target that builds ctags for the source code
   add_custom_target(
     generate_ctags ALL
     ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .
     WORKING_DIRECTORY ${BASE_DIR}/c++
-    COMMENT "Regenerating ctags file")
-endif()
+    COMMENT "Regenerating ctags file"
+  )
+endif ()
 
 # include_directories(${CAPNP_INCLUDE_DIRS})
 # add_definitions(${CAPNP_DEFINITIONS})
@@ -102,27 +103,31 @@ target_link_libraries(test msgx spdlog::spdlog)
 
 # Create the ${ProjectName}Config.cmake file for the build tree.
 set(CONF_INCLUDE_DIRS ${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
-configure_file(${PROJECT_NAME}Config.cmake.in
-               "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake" @ONLY)
+configure_file(
+  ${PROJECT_NAME}Config.cmake.in
+  "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake" @ONLY
+)
 
 # Create the ${PROJECT_NAME}Config.cmake file for the install tree.
 set(CONF_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include)
 configure_file(
   ${PROJECT_NAME}Config.cmake.in
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
-  @ONLY)
+  @ONLY
+)
 
 # Install the ${PROJECT_NAME}Config.cmake file
 install(
   FILES
     "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
   DESTINATION "${INSTALL_CMAKE_DIR}"
-  COMPONENT dev)
+  COMPONENT dev
+)
 
 # Install the export set for use with the install tree install( EXPORT
 # ${PROJECT_NAME}Targets EXPORT ${PROJECT_NAME}Targets DESTINATION
 # "${INSTALL_CMAKE_DIR}" COMPONENT dev)
 
-# if (${BUILD_TESTS})
-add_subdirectory(tests)
-# endif ()
+if (${BUILD_TESTS})
+  add_subdirectory(tests)
+endif ()

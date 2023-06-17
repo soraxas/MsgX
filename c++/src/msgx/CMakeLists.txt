@@ -1,14 +1,11 @@
-# include_directories(${CMAKE_SOURCE_DIR}/include)
-
-message(include_directories (${CMAKE_SOURCE_DIR}/include)
-        okok${CAPNP_INCLUDE_DIRS}haie)
-
 set(SOURCE_FILES opaque_item/mappings.c++ opaque_item/item.c++
-                 opaque_item/bindable_item.c++)
+                 opaque_item/bindable_item.c++ comms/zmq.c++
+)
 set(HEADER_FILES ${CAPNP_HEADER} ../../include/msgx/message.h)
-set(PUBLIC_LINK_LIBARARIES CapnProto::capnp ${CAPNP_LIBRARIES} msgx_capnp zmq
-                           ${ZMQ_LIBRARIES})
-set(PRIVATE_LINK_LIBARARIES spdlog::spdlog)
+set(PUBLIC_LINK_LIBRARIES CapnProto::capnp ${CAPNP_LIBRARIES} msgx_capnp zmq
+                          ${ZMQ_LIBRARIES}
+)
+set(PRIVATE_LINK_LIBRARIES spdlog::spdlog)
 
 # target_link_libraries(${PROJECT_NAME} )
 # target_include_directories(${PROJECT_NAME} PRIVATE
@@ -16,19 +13,19 @@ set(PRIVATE_LINK_LIBARARIES spdlog::spdlog)
 
 # Build library
 add_library(msgx ${SOURCE_FILES} ${HEADER_FILES})
-target_link_libraries(msgx PUBLIC ${PUBLIC_LINK_LIBARARIES})
-target_link_libraries(msgx PRIVATE ${PUBLIC_LINK_LIBARARIES})
+target_link_libraries(msgx PUBLIC ${PUBLIC_LINK_LIBRARIES})
+target_link_libraries(msgx PRIVATE ${PUBLIC_LINK_LIBRARIES})
 
 target_include_directories(
   msgx PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-              $<INSTALL_INTERFACE:> <prefix>/include/msgx)
-
-target_include_directories(msgx PUBLIC ../../include)
+              $<INSTALL_INTERFACE:> <prefix>/include/msgx ../../include
+)
 
 # Installation setup
 set_target_properties(
-  msgx PROPERTIES PUBLIC_HEADER "${HEADER_FILES}"
-                  IMPORTED_LINK_DEPENDENT_LIBRARIES "${PUBLIC_LINK_LIBARARIES}")
+  msgx PROPERTIES PUBLIC_HEADER "${HEADER_FILES}" #
+                  IMPORTED_LINK_DEPENDENT_LIBRARIES "${PUBLIC_LINK_LIBRARIES}"
+)
 
 install(
   TARGETS msgx
@@ -36,7 +33,8 @@ install(
   LIBRARY DESTINATION ${INSTALL_LIB_DIR}
   PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
   INCLUDES
-  DESTINATION ${INSTALL_INCLUDE_DIR})
+  DESTINATION ${INSTALL_INCLUDE_DIR}
+)
 
 install(
   DIRECTORY "msgx/" # source directory
@@ -45,14 +43,9 @@ install(
   PATTERN "*.h" # select header files
 )
 
-# install the generated protobuf header get_target_property(PROTO_HEADER
-# proto_plotmsg_cpp PUBLIC_HEADER) install(FILES ${PROTO_HEADER} DESTINATION
-# ${INSTALL_INCLUDE_DIR}/_impl )
-
-# message(FATAL_ERROR ${PROTO_HEADER} )
-
 # Add all targets to the build-tree export set
 export(
   TARGETS msgx
   APPEND
-  FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake")
+  FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake"
+)
