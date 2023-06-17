@@ -3,9 +3,9 @@ set(SOURCE_FILES opaque_item/mappings.c++ opaque_item/item.c++
 )
 set(HEADER_FILES ${CAPNP_HEADER} ../../include/msgx/message.h)
 set(PUBLIC_LINK_LIBRARIES CapnProto::capnp ${CAPNP_LIBRARIES} msgx_capnp zmq
-                          ${ZMQ_LIBRARIES}
+                          ${ZMQ_LIBRARIES} spdlog::spdlog
 )
-set(PRIVATE_LINK_LIBRARIES spdlog::spdlog)
+# set(PRIVATE_LINK_LIBRARIES spdlog::spdlog)
 
 # target_link_libraries(${PROJECT_NAME} )
 # target_include_directories(${PROJECT_NAME} PRIVATE

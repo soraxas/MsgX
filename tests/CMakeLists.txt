@@ -6,7 +6,8 @@ cpmaddpackage("gh:TheLartians/Format.cmake@1.7.3")
 add_executable(msgx_test msgx_test.c++)
 
 set(CMAKE_MODULE_PATH "${doctest_SOURCE_DIR}/scripts/cmake"
-                      ${CMAKE_MODULE_PATH})
+                      ${CMAKE_MODULE_PATH}
+)
 
 add_dependencies(msgx_test doctest)
 

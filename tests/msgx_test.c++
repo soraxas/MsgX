@@ -80,14 +80,14 @@ TEST_CASE("Test with and without orphanage")
     // both of them should still allow us to build
     OpaqueItemBuilder builder = msg_builder.initRoot<msgx::type::Item::Oneof>();
     downcast.build(builder);
-    CHECK_EQ(builder.which(), Which::INT_ARRAY);
-    auto reader = builder.getIntArray().getBuffer().asReader();
+    CHECK_EQ(builder.which(), Which::INT_LIST);
+    auto reader = builder.getIntList().asReader();
     CHECK_EQ(reader.size(), 2);
     CHECK_EQ(reader[0], 1);
     CHECK_EQ(reader[1], -42);
 }
 
-#define DOCTEST_MSGX_PARAMETERIZED_1D_ARRAY(VALUE, ONEOF_GETTER, VALUE_TYPE, CHECK_TRUE_STR)                           \
+#define DOCTEST_MSGX_PARAMETERIZED_1D_LIST(VALUE, ONEOF_GETTER, VALUE_TYPE, CHECK_TRUE_STR)                            \
     DOCTEST_SUBCASE((std::string("Test storing 1d array type [" #VALUE_TYPE "]").c_str()))                             \
     {                                                                                                                  \
         mapping["my_key"] = VALUE;                                                                                     \
@@ -98,9 +98,7 @@ TEST_CASE("Test with and without orphanage")
         OpaqueItemBuilder builder = msg_builder.initRoot<msgx::type::Item::Oneof>();                                   \
         downcast.build(builder);                                                                                       \
         CHECK_EQ(builder.which(), VALUE_TYPE);                                                                         \
-        CHECK_EQ(builder.which(), VALUE_TYPE);                                                                         \
-        auto buffer = builder.ONEOF_GETTER().getBuffer();                                                              \
-        CHECK_EQ(builder.ONEOF_GETTER().getOneDimensional(), ::capnp::VOID);                                           \
+        auto buffer = builder.ONEOF_GETTER();                                                                          \
         auto buf_reader = buffer.asReader();                                                                           \
         CHECK(CHECK_TRUE_STR);                                                                                         \
     }
@@ -112,25 +110,25 @@ TEST_CASE("Test storing composed item")
     capnp::MallocMessageBuilder msg_builder;
     OpaqueMapping mapping{[&msg_builder]() { return msg_builder.getOrphanage(); }};
 
-    DOCTEST_MSGX_PARAMETERIZED_1D_ARRAY({1 COMMA 2 COMMA 58 COMMA - 100}, getIntArray, Which::INT_ARRAY,
-                                        (buf_reader[3] == -100));
-    DOCTEST_MSGX_PARAMETERIZED_1D_ARRAY({5. COMMA - 1e-16 COMMA 5e37}, getDoubleArray, Which::DOUBLE_ARRAY,
-                                        (buf_reader[2] == doctest::Approx(5e37)));
-    DOCTEST_MSGX_PARAMETERIZED_1D_ARRAY({5.f COMMA - .01f}, getFloatArray, Which::FLOAT_ARRAY,
-                                        (buf_reader[1] == doctest::Approx(-.01f)));
+    DOCTEST_MSGX_PARAMETERIZED_1D_LIST({1 COMMA 2 COMMA 58 COMMA - 100}, getIntList, Which::INT_LIST,
+                                       (buf_reader[3] == -100));
+    DOCTEST_MSGX_PARAMETERIZED_1D_LIST({5. COMMA - 1e-16 COMMA 5e37}, getDoubleList, Which::DOUBLE_LIST,
+                                       (buf_reader[2] == doctest::Approx(5e37)));
+    DOCTEST_MSGX_PARAMETERIZED_1D_LIST({5.f COMMA - .01f}, getFloatList, Which::FLOAT_LIST,
+                                       (buf_reader[1] == doctest::Approx(-.01f)));
     std::vector<short> values = {1, 5, 10};
-    DOCTEST_MSGX_PARAMETERIZED_1D_ARRAY(values, getIntArray, Which::INT_ARRAY, true);
+    DOCTEST_MSGX_PARAMETERIZED_1D_LIST(values, getIntList, Which::INT_LIST, true);
 
-    DOCTEST_MSGX_PARAMETERIZED_1D_ARRAY(std::vector<unsigned short>{1 COMMA 2}, getIntArray, Which::INT_ARRAY, true);
-    DOCTEST_MSGX_PARAMETERIZED_1D_ARRAY(std::vector<unsigned char>{1 COMMA 2}, getIntArray, Which::INT_ARRAY, true);
-    DOCTEST_MSGX_PARAMETERIZED_1D_ARRAY(std::vector<long>{1 COMMA 2}, getLongArray, Which::LONG_ARRAY, true);
-    DOCTEST_MSGX_PARAMETERIZED_1D_ARRAY(std::vector<unsigned int>{1 COMMA 2}, getLongArray, Which::LONG_ARRAY, true);
-    DOCTEST_MSGX_PARAMETERIZED_1D_ARRAY(std::vector<unsigned long>{1 COMMA 2}, getLongArray, Which::LONG_ARRAY, true);
+    DOCTEST_MSGX_PARAMETERIZED_1D_LIST(std::vector<unsigned short>{1 COMMA 2}, getIntList, Which::INT_LIST, true);
+    DOCTEST_MSGX_PARAMETERIZED_1D_LIST(std::vector<unsigned char>{1 COMMA 2}, getIntList, Which::INT_LIST, true);
+    DOCTEST_MSGX_PARAMETERIZED_1D_LIST(std::vector<long>{1 COMMA 2}, getLongList, Which::LONG_LIST, true);
+    DOCTEST_MSGX_PARAMETERIZED_1D_LIST(std::vector<unsigned int>{1 COMMA 2}, getLongList, Which::LONG_LIST, true);
+    DOCTEST_MSGX_PARAMETERIZED_1D_LIST(std::vector<unsigned long>{1 COMMA 2}, getLongList, Which::LONG_LIST, true);
 
-    DOCTEST_MSGX_PARAMETERIZED_1D_ARRAY({true COMMA false}, getBoolArray, Which::BOOL_ARRAY, (buf_reader[1] == false));
+    DOCTEST_MSGX_PARAMETERIZED_1D_LIST({true COMMA false}, getBoolList, Which::BOOL_LIST, (buf_reader[1] == false));
 
-    DOCTEST_MSGX_PARAMETERIZED_1D_ARRAY({"true" COMMA "meme"}, getStringArray, Which::STRING_ARRAY,
-                                        (buf_reader[1] == "meme"));
+    DOCTEST_MSGX_PARAMETERIZED_1D_LIST({"true" COMMA "meme"}, getStringList, Which::STRING_LIST,
+                                       (buf_reader[1] == "meme"));
 }
 
 TEST_CASE("Test storing composed item")
@@ -142,8 +140,7 @@ TEST_CASE("Test storing composed item")
     auto builder2 = msg_builder.initRoot<msgx::type::Item>();
     auto builder3 = msg_builder.initRoot<msgx::type::Item>();
 
-    auto anyarray = builder3.initOneof().initAnyArray();
-    auto anyarraybuf = anyarray.initBuffer(5);
+    auto anyarraybuf = builder3.initOneof().initAnyList(5);
 
     anyarraybuf.setWithCaveats(0, builder);
 

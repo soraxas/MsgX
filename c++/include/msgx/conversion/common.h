@@ -88,11 +88,14 @@ constexpr auto get_device_specific_endian()
         return ::msgx::type::ndarray::Endianness::BIG_ENDIAN_ORDER;
 }
 
-template <typename T>
-using enable_if_is_numeric_t = typename std::enable_if<std::is_arithmetic<T>::value, T>::type;
+template <class T>
+constexpr bool is_numeric_v = std::is_arithmetic<T>::value && !std::is_same<T, bool>::value;
 
 template <typename T>
-using disable_if_is_numeric_t = typename std::enable_if<!std::is_arithmetic<T>::value, T>::type;
+using enable_if_is_numeric_t = typename std::enable_if<is_numeric_v<T>, T>::type;
+
+template <typename T>
+using disable_if_is_numeric_t = typename std::enable_if<!is_numeric_v<T>, T>::type;
 
 }  // namespace helpers
 }  // namespace msgx
