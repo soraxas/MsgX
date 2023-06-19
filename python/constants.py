@@ -7,6 +7,7 @@ DataType = msg_definitions.ndarray_capnp.DataType
 
 # enum endian-ness type
 ENDIANNESS_MAPPING = {
+    Endianness.unspecified: None,
     Endianness.littleEndianOrder: "little",
     Endianness.bigEndianOrder: "big",
     Endianness.middleEndianOrder: None,

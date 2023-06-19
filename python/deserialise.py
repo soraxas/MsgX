@@ -78,7 +78,17 @@ def decode_ndarray(value):
 
     array = np.frombuffer(value.buffer, dtype=DATATYPE_MAPPING[value.dtype.raw])
     if value.which == "multiDimensional":
-        raise NotImplementedError("nope")
+        multi_dim = value.multiDimensional
+        array = array.reshape(
+            multi_dim.shape, order="F" if multi_dim.columnMajor else "C"
+        )
+
+    else:
+        if array.size != value.oneDimensional:
+            raise RuntimeError(
+                f"Inconsistency of buffer elements detected! Binary buffer seems to contains "
+                f"{array.size}, while the message specify of having {value.oneDimensional} elements."
+            )
 
     return array
 
