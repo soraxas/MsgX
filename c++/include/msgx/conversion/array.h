@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "msgx/conversion/common.h"
@@ -17,9 +16,10 @@ void numeric_ptr_to_ndarray(msgx::type::ndarray::NdArray::Builder ndarray_builde
     // set data type
     ndarray_builder.setDtype(msgx::detail::DTypeToEnum<DataType>());
     // cast given pointer to byte, then calculate word size
-    auto byte_ptr = reinterpret_cast<const byte *>(ptr);
-    auto word_size = sizeof(DataType) * num_elements;
+    const auto byte_ptr = reinterpret_cast<const byte *>(ptr);
+    const auto word_size = sizeof(DataType) * num_elements;
     ndarray_builder.setBuffer(kj::arrayPtr(byte_ptr, word_size));
+    ndarray_builder.setOneDimensional(num_elements);
 
     // assign device specific endianness, which is actually const
     ndarray_builder.setEndianness(msgx::helpers::get_device_specific_endian());
@@ -30,7 +30,8 @@ namespace conversion
 {
 
 template <typename ContainerDataType, typename DataType = typename ContainerDataType::value_type,
-          typename helpers::enable_if_is_numeric_t<DataType> * = nullptr>
+          typename helpers::enable_if_is_numeric_t<DataType> * = nullptr,
+          typename helpers::disable_if_is_eigen_matrix_type_t<ContainerDataType> * = nullptr>
 void opaque_item(msgx::BindableOpaqueItem &item, const ContainerDataType &values)
 {
     SPDLOG_DEBUG("[Conversion] stl container type {} with size '{}'", typeid(DataType).name(), values.size());

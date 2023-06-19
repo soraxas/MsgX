@@ -10,10 +10,10 @@ namespace msgx
 {
 namespace comms
 {
-namespace detail
-{
-struct BindedZmq;
-}
+
+// clang-format off
+namespace detail { struct BindedZmq; }  // forward declare
+// clang-format on
 
 class Zmq
 {

@@ -88,6 +88,8 @@ constexpr auto get_device_specific_endian()
         return ::msgx::type::ndarray::Endianness::BIG_ENDIAN_ORDER;
 }
 
+/* Metaprogramming */
+
 template <class T>
 constexpr bool is_numeric_v = std::is_arithmetic<T>::value && !std::is_same<T, bool>::value;
 
@@ -96,6 +98,27 @@ using enable_if_is_numeric_t = typename std::enable_if<is_numeric_v<T>, T>::type
 
 template <typename T>
 using disable_if_is_numeric_t = typename std::enable_if<!is_numeric_v<T>, T>::type;
+
+// meta class for metaprogramming for detecting eigen matrix
+
+// clang-format off
+template <class>
+struct sfinae_true : std::true_type {};
+
+namespace detail {
+    template <class T>
+    static auto test_is_matrix_type(int) -> sfinae_true<decltype(std::declval<T>().matrix())>;
+
+    template <class>
+    static auto test_is_matrix_type(long) -> std::false_type;
+}
+
+template <class T>
+struct is_eigen_matrix_type : decltype(detail::test_is_matrix_type<T>(0)) {};
+
+template <typename T>
+using disable_if_is_eigen_matrix_type_t = typename std::enable_if<!is_eigen_matrix_type<T>::value, T>::type;
+// clang-format on
 
 }  // namespace helpers
 }  // namespace msgx

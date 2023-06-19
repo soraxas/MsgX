@@ -39,7 +39,7 @@ struct NdArray {
     buffer                 @0: Data;
 
     union {
-        oneDimensional     @1: Void;
+        oneDimensional     @1: UInt32;
         multiDimensional :group {
             columnMajor    @2: Bool;
             shape          @3: List(UInt32);
