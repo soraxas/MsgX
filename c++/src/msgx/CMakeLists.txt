@@ -1,7 +1,21 @@
-set(SOURCE_FILES opaque_item/mappings.c++ opaque_item/item.c++
-                 opaque_item/bindable_item.c++ comms/zmq.c++
+set(SOURCE_FILES
+    # cmake-format: sortable
+    comms/zmq.c++
+    dispatcher/builder_adopt_dispatcher.c++
+    kwargs.c++
+    message.c++
+    opaque_item/bindable_item.c++
+    opaque_item/item.c++
+    opaque_item/mappings.c++
 )
-set(HEADER_FILES ${CAPNP_HEADER} ../../include/msgx/message.h)
+set(HEADER_FILES
+    # cmake-format: sortable
+    ${CAPNP_HEADER}
+    ../../include/msgx/conversion/anylist_interface.h
+    ../../include/msgx/conversion/mapping_interface.h
+    ../../include/msgx/dispatcher/builder_adopt_dispatcher.h
+    ../../include/msgx/message.h
+)
 set(PUBLIC_LINK_LIBRARIES CapnProto::capnp ${CAPNP_LIBRARIES} msgx_capnp zmq
                           ${ZMQ_LIBRARIES} spdlog::spdlog
 )

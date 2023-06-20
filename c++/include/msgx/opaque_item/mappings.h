@@ -29,8 +29,12 @@ protected:
         template <typename T>
         IndexAccessProxy &operator=(T &other)
         {
+            using decay_T = typename std::decay<T>::type;
+
             auto ptr = std::make_unique<msgx::BindableOpaqueItem>(mapping_parent_->get_orphanage_functor_);
-            ::msgx::conversion::opaque_item(*ptr, std::forward<T>(other));
+            //            ::msgx::conversion<decay_T>::convert(*ptr, std::forward<decay_T>(other));
+            //            ::msgx::conversion<decay_T>::convert(*ptr, other);
+            ::msgx::detail::call_conversion<decay_T>(*ptr, other);
             assignment_callback_(std::move(ptr));
             return *this;
         }

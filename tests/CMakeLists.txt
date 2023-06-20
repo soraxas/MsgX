@@ -17,12 +17,18 @@ if (NOT Eigen3_FOUND)
     https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz
   )
   if (Eigen_ADDED)
-    add_library(Eigen3::Eigen INTERFACE IMPORTED)
+    add_library(
+      Eigen3::Eigen INTERFACE IMPORTED
+      ../c++/include/msgx/conversion/mapping_interface.h
+    )
     target_include_directories(Eigen3::Eigen INTERFACE ${Eigen_SOURCE_DIR})
   endif ()
 endif ()
 
-add_executable(msgx_test msgx_test.c++ test_eigen.c++ test_primitives_lists.c++)
+add_executable(
+  msgx_test msgx_test.c++ test_any_list.c++ test_eigen.c++ test_lists.c++
+            test_ndarray.c++ test_primitives.c++
+)
 
 set(CMAKE_MODULE_PATH "${doctest_SOURCE_DIR}/scripts/cmake"
                       ${CMAKE_MODULE_PATH}

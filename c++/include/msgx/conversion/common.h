@@ -117,8 +117,43 @@ template <class T>
 struct is_eigen_matrix_type : decltype(detail::test_is_matrix_type<T>(0)) {};
 
 template <typename T>
+constexpr bool is_eigen_matrix_type_v = is_eigen_matrix_type<T>::value;
+
+template <typename T>
 using disable_if_is_eigen_matrix_type_t = typename std::enable_if<!is_eigen_matrix_type<T>::value, T>::type;
 // clang-format on
+
+////////////////
+
+// namespace detail {
+// template <class T>
+// static auto test_contains_data_ptr(int) -> sfinae_true<decltype(std::declval<T>().data())>;
+//
+// template <class>
+// static auto test_contains_data_ptr(long) -> std::false_type;
+// }
+//
+// template <class T>
+// struct has_data_ptr : decltype(detail::test_contains_data_ptr<T>(0)) {};
+
+namespace detail
+{
+template <typename T>
+auto has_data_ptr_impl(int) -> decltype(  //
+    void(*std::declval<T>().data()),      // operator*
+    std::true_type{});
+
+template <typename T>
+std::false_type has_data_ptr_impl(...);
+}  // namespace detail
+
+template <typename T>
+using has_data_ptr = decltype(detail::has_data_ptr_impl<T>(0));
+
+template <typename T>
+constexpr bool has_data_ptr_v = has_data_ptr<T>::value;
+
+////////////////
 
 }  // namespace helpers
 }  // namespace msgx

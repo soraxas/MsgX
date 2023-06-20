@@ -1,5 +1,6 @@
 #pragma once
 
+#include "msgx/dispatcher/builder_adopt_dispatcher.h"
 #include "msgx/opaque_item/item.h"
 
 namespace msgx
@@ -7,39 +8,43 @@ namespace msgx
 
 struct OpaqueMapping;
 
-namespace conversion
-{
+//// identity function that passthrough its input
 
-// identity function that passthrough its input
-template <typename Derived, typename = std::enable_if_t<std::is_base_of<::msgx::OpaqueItem, Derived>::value>>
-inline void opaque_item(msgx::BindableOpaqueItem &item, std::shared_ptr<Derived> rhs_item)
+// identity function that passthrough its input, for shared_ptr
+template <typename Derived>
+struct conversion<std::shared_ptr<Derived>,
+                  typename std::enable_if_t<std::is_base_of<::msgx::OpaqueItem, Derived>::value>>
 {
-    SPDLOG_DEBUG("[Conversion] passthrough opaque shared ptr");
-    item.set_assignment_callback([rhs_item](OpaqueItemBuilder builder) { rhs_item->build(builder); });
-}
+    static constexpr bool directly_assignable = true;
 
-// identity function that passthrough its input, for unique_ptr
-template <typename Derived, typename = std::enable_if_t<std::is_base_of<::msgx::OpaqueItem, Derived>::value>>
-inline void opaque_item(msgx::BindableOpaqueItem &item, std::unique_ptr<Derived> rhs_item)
+    static void convert(OpaqueItemBuilder builder, std::shared_ptr<Derived> rhs_item)
+    {
+        SPDLOG_DEBUG("[Conversion] passthrough opaque shared ptr");
+        rhs_item->build(builder);
+    }
+};
+
+// identity function that passthrough its input, for unique ptr (NOTE, it is not directly assignable, i.e., no copy)
+template <typename Derived>
+struct conversion<std::unique_ptr<Derived>,
+                  typename std::enable_if_t<std::is_base_of<::msgx::OpaqueItem, Derived>::value>>
 {
-    SPDLOG_DEBUG("[Conversion] rebinding opaque unique ptr to shared ptr");
-    // bind the unique ptr to shared ptr as std::function does not allow non-copyable objects
-    std::shared_ptr<std::decay_t<Derived>> shared_ptr = std::move(rhs_item);
-    opaque_item(item, std::move(shared_ptr));
-}
+    static void convert(OpaqueItemBuilder builder, std::unique_ptr<Derived> rhs_item)
+    {
+        SPDLOG_DEBUG("[Conversion] rebinding opaque unique ptr to shared ptr");
+        rhs_item->build(builder);
+    }
+};
 
-// identity function that passthrough its input
-inline void opaque_item(msgx::BindableOpaqueItem &item, msgx::OpaqueItem &rhs_item)
+template <>
+struct conversion<capnp::Orphan<type::Item::Oneof>>
 {
-    SPDLOG_DEBUG("[Conversion] passthrough opaque item");
-    item.set_assignment_callback([&rhs_item](OpaqueItemBuilder builder) { rhs_item.build(builder); });
-}
+    static void convert(OpaqueItemBuilder builder, capnp::Orphan<type::Item::Oneof> orphan)
+    {
+        SPDLOG_DEBUG("[Conversion] passthrough orphan of oneof with which: {}", orphan.getReader().which());
 
-inline void opaque_item(msgx::BindableOpaqueItem &item, capnp::Orphan<type::Item::Oneof> orphan)
-{
-    SPDLOG_DEBUG("[Conversion] passthrough orphan of oneof with which: {}", orphan.getReader().which());
-    item.assign_orphan(std::move(orphan));
-}
+        detail::builder_adopt_orphan(builder, std::move(orphan));
+    }
+};
 
-}  // namespace conversion
 }  // namespace msgx

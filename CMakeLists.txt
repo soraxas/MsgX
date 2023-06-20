@@ -71,8 +71,8 @@ include_directories(c++/include)
 
 add_subdirectory(c++/src)
 
-add_executable(test main.c++)
-target_link_libraries(test msgx spdlog::spdlog)
+#add_executable(test main.c++)
+#target_link_libraries(test msgx spdlog::spdlog)
 
 # python scripts add_custom_target( copy-python-pkg-template ALL COMMAND
 # ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/scripts

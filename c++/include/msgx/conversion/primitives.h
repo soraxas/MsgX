@@ -1,104 +1,186 @@
 #pragma once
 
+#include "msgx/conversion/convertible.h"
 #include "msgx/opaque_item/item.h"
 
 namespace msgx
 {
-namespace conversion
-{
 
-inline void opaque_item(msgx::BindableOpaqueItem &item, std::nullptr_t)
+template <>
+struct conversion<std::nullptr_t>
 {
-    SPDLOG_DEBUG("[Conversion] nullptr");
-    item.set_assignment_callback([](OpaqueItemBuilder builder) { builder.setNull(); });
-}
+    static constexpr bool directly_assignable = true;
 
-inline void opaque_item(msgx::BindableOpaqueItem &item, const bool value)
-{
-    SPDLOG_DEBUG("[Conversion] bool '{}'", value);
-    item.set_assignment_callback([value](OpaqueItemBuilder builder) { builder.setBool(value); });
-}
+    static void convert(OpaqueItemBuilder builder, std::nullptr_t)
+    {
+        SPDLOG_DEBUG("[Conversion] nullptr");
+        builder.setNull();
+    }
+};
 
-inline void opaque_item(msgx::BindableOpaqueItem &item, const std::string &value)
+template <>
+struct conversion<bool>
 {
-    SPDLOG_DEBUG("[Conversion] std::string '{}'", value);
-    item.set_assignment_callback([value](OpaqueItemBuilder builder) { builder.setString(value); });
-}
+    static constexpr bool directly_assignable = true;
 
-inline void opaque_item(msgx::BindableOpaqueItem &item, const char *value)
+    static void convert(OpaqueItemBuilder builder, const bool value)
+    {
+        SPDLOG_DEBUG("[Conversion] bool '{}'", value);
+        builder.setBool(value);
+    }
+};
+
+template <>
+struct conversion<std::string &>
 {
-    SPDLOG_DEBUG("[Conversion] const char '{}'", value);
-    item.set_assignment_callback([value](OpaqueItemBuilder builder) { builder.setString(value); });
-}
+    static constexpr bool directly_assignable = true;
+
+    static void convert(OpaqueItemBuilder builder, const std::string &value)
+    {
+        SPDLOG_DEBUG("[Conversion] std::string '{}'", value);
+        builder.setString(value);
+    }
+};
+
+template <>
+struct conversion<const char *>
+{
+    static constexpr bool directly_assignable = true;
+
+    static void convert(OpaqueItemBuilder builder, const char *value)
+    {
+        SPDLOG_DEBUG("[Conversion] const char '{}'", value);
+        builder.setString(value);
+    }
+};
 
 /*
  * ===== signed =====
  */
-inline void opaque_item(msgx::BindableOpaqueItem &item, const char value)
+template <>
+struct conversion<char>
 {
-    SPDLOG_DEBUG("[Conversion] char '{}'", value);
-    item.set_assignment_callback([value](OpaqueItemBuilder builder) { builder.setChar(value); });
-}
+    static constexpr bool directly_assignable = true;
 
-inline void opaque_item(msgx::BindableOpaqueItem &item, const int16_t value)
-{
-    SPDLOG_DEBUG("[Conversion] int16_t '{}'", value);
-    item.set_assignment_callback([value](OpaqueItemBuilder builder) { builder.setShort(value); });
-}
+    static void convert(OpaqueItemBuilder builder, const char value)
+    {
+        SPDLOG_DEBUG("[Conversion] char '{}'", value);
+        builder.setChar(value);
+    }
+};
 
-inline void opaque_item(msgx::BindableOpaqueItem &item, const int32_t value)
+template <>
+struct conversion<int16_t>
 {
-    SPDLOG_DEBUG("[Conversion] int32_t '{}'", value);
-    item.set_assignment_callback([value](OpaqueItemBuilder builder) { builder.setInt(value); });
-}
+    static constexpr bool directly_assignable = true;
 
-inline void opaque_item(msgx::BindableOpaqueItem &item, const int64_t value)
+    static void convert(OpaqueItemBuilder builder, const int16_t value)
+    {
+        SPDLOG_DEBUG("[Conversion] int16_t '{}'", value);
+        builder.setShort(value);
+    }
+};
+
+template <>
+struct conversion<int32_t>
 {
-    SPDLOG_DEBUG("[Conversion] int64_t '{}'", value);
-    item.set_assignment_callback([value](OpaqueItemBuilder builder) { builder.setLong(value); });
-}
+    static constexpr bool directly_assignable = true;
+
+    static void convert(OpaqueItemBuilder builder, const int32_t value)
+    {
+        SPDLOG_DEBUG("[Conversion] int32_t '{}'", value);
+        builder.setInt(value);
+    }
+};
+
+template <>
+struct conversion<int64_t>
+{
+    static constexpr bool directly_assignable = true;
+
+    static void convert(OpaqueItemBuilder builder, const int64_t value)
+    {
+        SPDLOG_DEBUG("[Conversion] int64_t '{}'", value);
+        builder.setLong(value);
+    }
+};
 
 /*
  * ===== unsigned =====
  */
-inline void opaque_item(msgx::BindableOpaqueItem &item, const unsigned char value)
+template <>
+struct conversion<unsigned char>
 {
-    SPDLOG_DEBUG("[Conversion] char '{}'", value);
-    item.set_assignment_callback([value](OpaqueItemBuilder builder) { builder.setUChar(value); });
-}
+    static constexpr bool directly_assignable = true;
 
-inline void opaque_item(msgx::BindableOpaqueItem &item, const uint16_t value)
-{
-    SPDLOG_DEBUG("[Conversion] uint16_t '{}'", value);
-    item.set_assignment_callback([value](OpaqueItemBuilder builder) { builder.setUShort(value); });
-}
+    static void convert(OpaqueItemBuilder builder, const unsigned char value)
+    {
+        SPDLOG_DEBUG("[Conversion] char '{}'", value);
+        builder.setUChar(value);
+    }
+};
 
-inline void opaque_item(msgx::BindableOpaqueItem &item, const uint32_t value)
+template <>
+struct conversion<uint16_t>
 {
-    SPDLOG_DEBUG("[Conversion] uint32_t '{}'", value);
-    item.set_assignment_callback([value](OpaqueItemBuilder builder) { builder.setUInt(value); });
-}
+    static constexpr bool directly_assignable = true;
 
-inline void opaque_item(msgx::BindableOpaqueItem &item, const uint64_t value)
+    static void convert(OpaqueItemBuilder builder, const uint16_t value)
+    {
+        SPDLOG_DEBUG("[Conversion] uint16_t '{}'", value);
+        builder.setUShort(value);
+    }
+};
+
+template <>
+struct conversion<uint32_t>
 {
-    SPDLOG_DEBUG("[Conversion] uint64_t '{}'", value);
-    item.set_assignment_callback([value](OpaqueItemBuilder builder) { builder.setULong(value); });
-}
+    static constexpr bool directly_assignable = true;
+
+    static void convert(OpaqueItemBuilder builder, const uint32_t value)
+    {
+        SPDLOG_DEBUG("[Conversion] uint32_t '{}'", value);
+        builder.setUInt(value);
+    }
+};
+
+template <>
+struct conversion<uint64_t>
+{
+    static constexpr bool directly_assignable = true;
+
+    static void convert(OpaqueItemBuilder builder, const uint64_t value)
+    {
+        SPDLOG_DEBUG("[Conversion] uint64_t '{}'", value);
+        builder.setULong(value);
+    }
+};
 
 /*
  * ===== floating point =====
  */
-inline void opaque_item(msgx::BindableOpaqueItem &item, const float_t value)
+template <>
+struct conversion<float_t>
 {
-    SPDLOG_DEBUG("[Conversion] float_t '{}'", value);
-    item.set_assignment_callback([value](OpaqueItemBuilder builder) { builder.setFloat(value); });
-}
+    static constexpr bool directly_assignable = true;
 
-inline void opaque_item(msgx::BindableOpaqueItem &item, const double_t value)
+    static void convert(OpaqueItemBuilder builder, const float_t value)
+    {
+        SPDLOG_DEBUG("[Conversion] float_t '{}'", value);
+        builder.setFloat(value);
+    }
+};
+
+template <>
+struct conversion<double_t>
 {
-    SPDLOG_DEBUG("[Conversion] double_t '{}'", value);
-    item.set_assignment_callback([value](OpaqueItemBuilder builder) { builder.setDouble(value); });
-}
+    static constexpr bool directly_assignable = true;
 
-}  // namespace conversion
+    static void convert(OpaqueItemBuilder builder, const double_t value)
+    {
+        SPDLOG_DEBUG("[Conversion] double_t '{}'", value);
+        builder.setDouble(value);
+    }
+};
+
 }  // namespace msgx

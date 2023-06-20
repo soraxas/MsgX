@@ -1,8 +1,9 @@
 #pragma once
 
 #include "msgx/conversion/common.h"
+#include "msgx/conversion/convertible.h"
+#include "msgx/dispatcher/ndarray_dispatcher.h"
 #include "msgx/opaque_item/item.h"
-#include "msgx/opaque_item/ndarray_dispatcher.h"
 
 namespace msgx
 {
@@ -26,31 +27,34 @@ void numeric_ptr_to_ndarray(msgx::type::ndarray::NdArray::Builder ndarray_builde
 }
 }  // namespace detail
 
-namespace conversion
+template <typename Container>
+struct conversion<Container,
+                  typename std::enable_if<                                      //
+                      helpers::is_numeric_v<typename Container::value_type> &&  // is numeric
+                          helpers::has_data_ptr_v<Container> &&                 // has data ptr member
+                          !helpers::is_eigen_matrix_type_v<Container>,          // not eigen
+                      void>::type>
 {
+    static void convert(OpaqueItemBuilder builder, const Container &values)
+    {
+        SPDLOG_DEBUG("[Conversion] stl container type {} with size '{}'", typeid(Container::value_type).name(),
+                     values.size());
 
-template <typename ContainerDataType, typename DataType = typename ContainerDataType::value_type,
-          typename helpers::enable_if_is_numeric_t<DataType> * = nullptr,
-          typename helpers::disable_if_is_eigen_matrix_type_t<ContainerDataType> * = nullptr>
-void opaque_item(msgx::BindableOpaqueItem &item, const ContainerDataType &values)
+        detail::numeric_ptr_to_ndarray<typename Container::value_type>(builder.initNdArray(), values.data(),
+                                                                       values.size());
+    }
+};
+
+template <typename DataType>
+struct conversion<std::initializer_list<DataType>,
+                  typename std::enable_if<helpers::is_numeric_v<DataType>,  // is numeric
+                                          void>::type>
 {
-    SPDLOG_DEBUG("[Conversion] stl container type {} with size '{}'", typeid(DataType).name(), values.size());
+    static void convert(OpaqueItemBuilder builder, const std::initializer_list<DataType> &values)
+    {
+        std::vector<DataType> vector_values = std::move(values);
+        msgx::conversion<std::vector<DataType>>::convert(builder, vector_values);
+    }
+};
 
-    auto _main_body = [](OpaqueItemBuilder builder, const ContainerDataType &values)
-    { detail::numeric_ptr_to_ndarray<DataType>(builder.initNdArray(), values.data(), values.size()); };
-
-    ::msgx::helpers::_run_callback_with_or_without_orphanage<ContainerDataType>(item, values, _main_body);
-}
-
-template <typename DataType, typename helpers::enable_if_is_numeric_t<DataType> * = nullptr>
-void opaque_item(msgx::BindableOpaqueItem &item, std::initializer_list<DataType> values)
-{
-    SPDLOG_DEBUG("[Conversion] initializer_list type {} with size '{}'", typeid(DataType).name(), values.size());
-    // move to a vector so that we can use the ptr
-
-    std::vector<DataType> vector_values = std::move(values);
-    msgx::conversion::opaque_item<std::vector<DataType>>(item, vector_values);
-}
-
-}  // namespace conversion
 }  // namespace msgx

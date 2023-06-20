@@ -35,7 +35,7 @@ OpaqueMapping::IndexAccessProxy OpaqueMapping::operator[](const std::string &key
 OpaqueMapping::IndexAccessProxy &OpaqueMapping::IndexAccessProxy::operator=(msgx::OpaqueItemPtr other)
 {
     auto ptr = std::make_unique<msgx::BindableOpaqueItem>(mapping_parent_->get_orphanage_functor_);
-    ::msgx::conversion::opaque_item(*ptr, *other);
+    ::msgx::detail::call_conversion<msgx::OpaqueItemPtr>(*ptr, other);
     assignment_callback_(std::move(ptr));
     return *this;
 }
