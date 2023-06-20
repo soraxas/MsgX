@@ -49,7 +49,8 @@ namespace detail
 struct BindedZmq
 {
     template <class... Args>
-    explicit BindedZmq(Args... args) : zmq_instance(std::forward<Args>(args)...)
+    explicit BindedZmq(Args... args)
+      : zmq_instance(std::forward<Args>(args)...), binded_addr(::msgx::comms::remote_address())
     {
     }
 

@@ -17,8 +17,13 @@ set(HEADER_FILES
     ../../include/msgx/message.h
 )
 set(PUBLIC_LINK_LIBRARIES CapnProto::capnp ${CAPNP_LIBRARIES} msgx_capnp zmq
-                          ${ZMQ_LIBRARIES} spdlog::spdlog
-)
+                          ${ZMQ_LIBRARIES}
+                          )
+
+if (BUILD_WITH_SPDLOG)
+  set(PUBLIC_LINK_LIBRARIES ${PUBLIC_LINK_LIBRARIES} spdlog::spdlog)
+endif()
+
 # set(PRIVATE_LINK_LIBRARIES spdlog::spdlog)
 
 # target_link_libraries(${PROJECT_NAME} )

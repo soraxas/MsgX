@@ -1,6 +1,6 @@
 #pragma once
 
-#include <spdlog/spdlog.h>
+#include <memory>
 
 #include "msgx/def.h"
 

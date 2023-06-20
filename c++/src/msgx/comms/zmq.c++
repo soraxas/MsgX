@@ -20,7 +20,6 @@ detail::BindedZmq &Zmq::get_instance()
     static std::unique_ptr<detail::BindedZmq> instance_;
     if (!instance_ || instance_->binded_addr != ::msgx::comms::remote_address())
     {
-        std::cout << msgx::comms::remote_address() << std::endl;
         instance_ = std::make_unique<detail::BindedZmq>();
     }
     return *instance_;

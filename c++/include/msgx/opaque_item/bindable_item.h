@@ -1,7 +1,5 @@
 #pragma once
 
-#include <spdlog/spdlog.h>
-
 #include "msgx/def.h"
 #include "msgx/opaque_item/item.h"
 

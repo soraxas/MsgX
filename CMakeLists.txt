@@ -33,7 +33,14 @@ if (NOT CapnProto_FOUND)
   set(CAPNPROTO_LIBRARIES CapnProto)
 endif ()
 
-cpmaddpackage("gh:gabime/spdlog@1.2.0")
+
+option(BUILD_WITH_SPDLOG "Build with spdlog?" FALSE)
+
+if (BUILD_WITH_SPDLOG)
+  cpmaddpackage("gh:gabime/spdlog@1.2.0")
+  add_compile_definitions(MSGX_BUILD_WITH_SPDLOG=1)
+endif()
+
 
 # find_package(cppzmq QUIET)
 
