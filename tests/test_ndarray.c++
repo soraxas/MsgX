@@ -1,40 +1,20 @@
-#include <doctest/doctest.h>
-
-#include "msgx/message.h"
+#include "test_common.h"
 
 using namespace msgx;
-using Which = msgx::type::Item::Oneof::Which;
 
-TEST_CASE("Test with and without orphanage")
+TEST_CASE("Test ndarray")
 {
-    bool has_orphanage;
-
-    //    SUBCASE("without orphanage")
-    //    {
-    //        has_orphanage = false;
-    //    }
-
-    SUBCASE("with orphanage")
-    {
-        has_orphanage = true;
-    }
-    capnp::MallocMessageBuilder msg_builder;
-    auto mapping = std::make_unique<OpaqueMapping>();
-    if (has_orphanage)
-        mapping = std::make_unique<OpaqueMapping>([&msg_builder]() { return msg_builder.getOrphanage(); });
+    MessageX msg;
+    auto mapping = msg.getLinkedItemPtr<OpaqueMapping>();
 
     (*mapping)["my_key"] = {1, -42};
     auto &my_key_ptr = mapping->get("my_key");
     CHECK(my_key_ptr);
-    auto &downcast = dynamic_cast<BindableOpaqueItem &>(*my_key_ptr);
-    if (has_orphanage)
-        CHECK(!downcast.has_orphan());
-    else
-        CHECK(downcast.has_orphan());
+    auto downcast = downcast_bindable_item(my_key_ptr.get());
 
     // both of them should still allow us to build
-    OpaqueItemBuilder builder = msg_builder.initRoot<msgx::type::Item::Oneof>();
-    downcast.build(builder);
+    OpaqueItemBuilder builder = get_oneof_builder(msg);
+    downcast->build(builder);
     CHECK_EQ(builder.which(), Which::ND_ARRAY);
     auto reader = builder.getNdArray();
     const int *data_ptr = reinterpret_cast<const int *>(reader.getBuffer().asReader().begin());
@@ -45,7 +25,7 @@ TEST_CASE("Test with and without orphanage")
 }
 
 #define DOCTEST_MSGX_PARAMETERIZED_1D_LIST(VALUE, ONEOF_GETTER, VALUE_TYPE, CHECK_TRUE_STR)                            \
-    DOCTEST_SUBCASE((std::string("Test storing 1d array type [" #VALUE_TYPE "]").c_str()))                             \
+    /* DOCTEST_SUBCASE((std::string("Test storing 1d array type [" #VALUE_TYPE "]").c_str())) */                       \
     {                                                                                                                  \
         mapping["my_key"] = VALUE;                                                                                     \
         auto &my_key_ptr = mapping.get("my_key");                                                                      \

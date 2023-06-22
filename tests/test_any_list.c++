@@ -1,9 +1,4 @@
-#include <doctest/doctest.h>
-
-#include "msgx/message.h"
-
-using namespace msgx;
-using Which = msgx::type::Item::Oneof::Which;
+#include "test_common.h"
 
 TEST_CASE("Test building any list")
 {

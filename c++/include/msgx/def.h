@@ -6,8 +6,10 @@
 
 #include "msgx.capnp.h"
 
-#ifdef MSGX_BUILD_WITH_SPDLOG
-#include <spdlog/spdlog.h>
+#ifdef BUILD_WITH_EASYSPDLOG
+// #include <spdlog/spdlog.h>
+#define EASYSPDLOG_AUTO_SETUP
+#include <easyspdlog.h>
 #else
 #define SPDLOG_ERROR(...)
 #define SPDLOG_DEBUG(...)

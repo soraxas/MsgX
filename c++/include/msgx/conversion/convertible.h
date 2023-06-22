@@ -66,7 +66,7 @@ void call_conversion(msgx::BindableOpaqueItem &opaque_item, T2 &&other)
 {
     if (opaque_item.has_orphanage())
     {
-        SPDLOG_TRACE("creating an orphan for datatype: {}", typeid(T1).name());
+        SPDLOG_TRACE("creating an orphan for datatype: {}", EASYSPDLOG_TYPE_NAME(T1));
         auto builder = opaque_item.get_orphan_or_malloc_builder();
 
         // construct it in-place right now to avoid copy

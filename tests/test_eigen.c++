@@ -1,32 +1,29 @@
-#include <doctest/doctest.h>
-
 #include <Eigen/Dense>
 
-#include "msgx/conversion/eigen.h"
-#include "msgx/message.h"
+#include "test_common.h"
 
-using namespace msgx;
 using Eigen::MatrixXd;
 
 TEST_CASE("Test eigen")
 {
-    capnp::MallocMessageBuilder msg_builder;
-    OpaqueMapping mapping{[&msg_builder]() { return msg_builder.getOrphanage(); }};
+    MessageX msg;
+
+    std::unique_ptr<OpaqueMapping> mapping = msg.getLinkedItemPtr<OpaqueMapping>();
 
     MatrixXd m(6, 3);
     m << 1, 2, 3, 4, 5, 6,       //
         7, 8, 9, 10, 11, 12,     //
         13, 14, 15, 16, 17, 18;  //
 
-    mapping["matrix"] = m;
+    (*mapping)["matrix"] = m;
 
-    OpaqueItemBuilder builder = msg_builder.initRoot<msgx::type::Item::Oneof>();
+    OpaqueItemBuilder builder = get_oneof_builder(msg);
 
-    auto &my_matrix = mapping.get("matrix");
+    auto &my_matrix = mapping->get("matrix");
     CHECK(my_matrix);
     my_matrix->build(builder);
 
-    CHECK_EQ(builder.which(), msgx::type::Item::Oneof::Which::ND_ARRAY);
+    CHECK_EQ(builder.which(), Which::ND_ARRAY);
 
     auto ndarray = builder.getNdArray();
     auto shape = ndarray.getMultiDimensional().getShape();

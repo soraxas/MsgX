@@ -40,12 +40,25 @@ public:
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "misc-unconventional-assign-operator"
+    //    template <typename T>
+    //    Kwargs operator=(T &val)
+    //    {
+    //        using decay_T = typename std::decay<T>::type;
+    //        SPDLOG_DEBUG("[kwargs] assigning type [{}&] (decay: {}) via binding", EASYSPDLOG_TYPE_NAME(T),
+    //        EASYSPDLOG_TYPE_NAME(decay_T));
+    //
+    //        return Kwargs{key_, [val = std::forward<decay_T>(val)](msgx::BindableOpaqueItem &item)
+    //                      { ::msgx::detail::call_conversion<decay_T>(item, val); }};
+    //    }
+
     template <typename T>
-    Kwargs operator=(T &val)
+    Kwargs operator=(const T &val)
     {
         using decay_T = typename std::decay<T>::type;
+        SPDLOG_DEBUG("[kwargs] assigning type [const {}&] (decay: {})", EASYSPDLOG_TYPE_NAME(T),
+                     EASYSPDLOG_TYPE_NAME(decay_T));
 
-        return Kwargs{key_, [val = std::forward<decay_T>(val)](msgx::BindableOpaqueItem &item)
+        return Kwargs{key_, [val = std::forward<const T>(val)](msgx::BindableOpaqueItem &item)
                       { ::msgx::detail::call_conversion<decay_T>(item, val); }};
     }
 
@@ -53,6 +66,25 @@ public:
     Kwargs operator=(T &&val)
     {
         using decay_T = typename std::decay<T>::type;
+        SPDLOG_DEBUG("[kwargs] assigning type [{}&&] (decay: {}) via move", EASYSPDLOG_TYPE_NAME(T),
+                     EASYSPDLOG_TYPE_NAME(decay_T));
+
+        //        // move the non-copyable rvalue to a shared pointer
+        //        auto non_copyable = std::make_shared<decay_T>(std::forward<T>(val));
+        //
+        //        return Kwargs{key_, [val = std::move(non_copyable)](msgx::BindableOpaqueItem &item)
+        //                      { ::msgx::detail::call_conversion<decay_T>(item, std::move(*val)); }};
+
+        return Kwargs{key_, [val = std::move(val)](msgx::BindableOpaqueItem &item)
+                      { ::msgx::detail::call_conversion<decay_T>(item, std::move(val)); }};
+    }
+
+    template <typename T>
+    Kwargs operator=(const T &&val)
+    {
+        using decay_T = typename std::decay<T>::type;
+        SPDLOG_DEBUG("[kwargs] assigning type [const {}&&] (decay: {}) via move", EASYSPDLOG_TYPE_NAME(T),
+                     EASYSPDLOG_TYPE_NAME(decay_T));
 
         // move the non-copyable rvalue to a shared pointer
         auto non_copyable = std::make_shared<decay_T>(std::forward<T>(val));
@@ -62,9 +94,9 @@ public:
     }
 
     template <typename T>
-    Kwargs operator=(const std::initializer_list<T> &other)
+    Kwargs operator=(std::initializer_list<T> other)
     {
-        return operator=<const std::initializer_list<T>>(other);
+        return operator=<std::initializer_list<T>>(other);
     }
 #pragma clang diagnostic pop
 

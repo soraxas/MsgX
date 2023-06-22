@@ -21,7 +21,7 @@ inline auto __Mapping(const OrphanageGetter &orphanage_getter, OpaqueMapping &ma
 }
 
 template <typename... Args>
-auto __Mapping(const OrphanageGetter &orphanage_getter, OpaqueMapping &mapping, Kwargs &&kwarg, Args... args)
+auto __Mapping(const OrphanageGetter &orphanage_getter, OpaqueMapping &mapping, Kwargs &&kwarg, Args &&...args)
 {
     __Mapping(orphanage_getter, mapping, kwarg);
     __Mapping(orphanage_getter, mapping, std::forward<Args>(args)...);
@@ -30,7 +30,7 @@ auto __Mapping(const OrphanageGetter &orphanage_getter, OpaqueMapping &mapping, 
 
 // alias easy function
 template <typename... Args>
-auto Mapping(const OrphanageGetter &orphanage_getter, Args... args)
+auto Mapping(const OrphanageGetter &orphanage_getter, Args &&...args)
 {
     auto opaque_mapping_ptr = std::make_unique<OpaqueMapping>(orphanage_getter);
 

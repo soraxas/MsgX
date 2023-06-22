@@ -40,13 +40,13 @@ void _run_callback_with_or_without_orphanage(msgx::BindableOpaqueItem &opaque_it
 {
     if (opaque_item.has_orphanage())
     {
-        SPDLOG_TRACE("creating an orphan for datatype: {}", typeid(T).name());
+        SPDLOG_TRACE("creating an orphan for datatype: {}", EASYSPDLOG_TYPE_NAME(T));
         // construct it in-place right now to avoid copy
         _main_body(opaque_item.get_orphan_or_malloc_builder(), values);
     }
     else
     {
-        SPDLOG_TRACE("no orphanage, copying datatype to callback: {}", typeid(T).name());
+        SPDLOG_TRACE("no orphanage, copying datatype to callback: {}", EASYSPDLOG_TYPE_NAME(T));
         // bind a lambda by copying value, and set it as callback
         opaque_item.set_assignment_callback(                 //
             [values, _main_body](OpaqueItemBuilder builder)  //

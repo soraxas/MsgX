@@ -68,14 +68,14 @@ public:
 
     // alias easy function
     template <typename... Args>
-    auto Mapping(Args... args)
+    auto Mapping(Args &&...args)
     {
         return std::move(msgx::Mapping(orphanage_getter_, std::forward<Args>(args)...));
     }
 
     // alias easy function
     template <typename... Args>
-    auto AnyList(Args... args)
+    auto AnyList(Args &&...args)
     {
         return std::move(msgx::AnyList(orphanage_getter_, std::forward<Args>(args)...));
     }

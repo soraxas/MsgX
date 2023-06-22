@@ -13,7 +13,7 @@ namespace conversion_helper
 template <typename DataType, template <typename, typename...> class ContainerType, typename... Args>
 void bind_as_list(OpaqueItemBuilder builder, const ContainerType<DataType, Args...> &values)
 {
-    SPDLOG_DEBUG("[Conversion] binding type {} as list with size '{}'", typeid(DataType).name(), values.size());
+    SPDLOG_DEBUG("[Conversion] binding type {} as list with size '{}'", EASYSPDLOG_TYPE_NAME(DataType), values.size());
 
     // calls the templated func
     msgx::helpers::build_capnp_list<DataType>(

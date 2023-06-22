@@ -37,8 +37,8 @@ struct conversion<Container,
 {
     static void convert(OpaqueItemBuilder builder, const Container &values)
     {
-        SPDLOG_DEBUG("[Conversion] stl container type {} with size '{}'", typeid(Container::value_type).name(),
-                     values.size());
+        SPDLOG_DEBUG("[Conversion] stl container type {} with size '{}'",
+                     EASYSPDLOG_TYPE_NAME(typename Container::value_type), values.size());
 
         detail::numeric_ptr_to_ndarray<typename Container::value_type>(builder.initNdArray(), values.data(),
                                                                        values.size());

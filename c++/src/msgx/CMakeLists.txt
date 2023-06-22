@@ -21,7 +21,8 @@ set(PUBLIC_LINK_LIBRARIES CapnProto::capnp ${CAPNP_LIBRARIES} msgx_capnp zmq
                           )
 
 if (BUILD_WITH_SPDLOG)
-  set(PUBLIC_LINK_LIBRARIES ${PUBLIC_LINK_LIBRARIES} spdlog::spdlog)
+  set(PUBLIC_LINK_LIBRARIES ${PUBLIC_LINK_LIBRARIES} easyspdlog)
+#  set(PUBLIC_LINK_LIBRARIES ${PUBLIC_LINK_LIBRARIES} spdlog::spdlog)
 endif()
 
 # set(PRIVATE_LINK_LIBRARIES spdlog::spdlog)

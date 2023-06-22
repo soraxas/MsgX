@@ -27,7 +27,8 @@ void _anylist_impl(const OrphanageGetter &orphanage_getter, std::vector<OpaqueIt
 }
 
 template <typename T, typename... Args>
-void _anylist_impl(const OrphanageGetter &orphanage_getter, std::vector<OpaqueItemPtr> &container, T arg, Args... args)
+void _anylist_impl(const OrphanageGetter &orphanage_getter, std::vector<OpaqueItemPtr> &container, T arg,
+                   Args &&...args)
 {
     // process one
     _anylist_impl(orphanage_getter, container, std::forward<T>(arg));
@@ -39,7 +40,7 @@ void _anylist_impl(const OrphanageGetter &orphanage_getter, std::vector<OpaqueIt
 
 // alias easy function
 template <typename... Args>
-auto AnyList(OrphanageGetter orphanage_getter, Args... args)
+auto AnyList(OrphanageGetter orphanage_getter, Args &&...args)
 {
     std::vector<OpaqueItemPtr> container;
     ::msgx::detail::_anylist_impl(orphanage_getter, container, std::forward<Args>(args)...);

@@ -20,7 +20,7 @@ struct conversion<Eigen::Matrix<Scalar, Options...>>
 {
     static void convert(OpaqueItemBuilder builder, const Eigen::Matrix<Scalar, Options...> &matrix)
     {
-        SPDLOG_DEBUG("[Conversion] eigen matrix type {} with size '{}'", typeid(Scalar).name(), matrix.size());
+        SPDLOG_DEBUG("[Conversion] eigen matrix type {} with size '{}'", EASYSPDLOG_TYPE_NAME(Scalar), matrix.size());
 
         // thee following works for converting MatrixBase to Ref type to retrieve data()
         //    typedef Eigen::Ref<

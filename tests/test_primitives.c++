@@ -1,20 +1,18 @@
-#include <doctest/doctest.h>
-
-#include "msgx/message.h"
+#include "test_common.h"
 
 using namespace msgx;
 using Which = msgx::type::Item::Oneof::Which;
 
 // check key is correct, and orphan is null, while we can retrieve value with builder
 #define DOCTEST_MSGX_PARAMETERIZED_CUSTOM_CHECKING(VALUE, ONEOF_GETTER, VALUE_TYPE, CHECK_TRUE_STR)                    \
-    DOCTEST_SUBCASE((std::string("Test storing primitive type [" #VALUE_TYPE "]").c_str()))                            \
+    /*DOCTEST_SUBCASE((std::string("Test storing primitive type [" #VALUE_TYPE "]").c_str())) */                       \
     {                                                                                                                  \
-        mapping["my_key"] = VALUE;                                                                                     \
-        auto &my_key_ptr = mapping.get("my_key");                                                                      \
+        (*mapping)["my_key"] = VALUE;                                                                                  \
+        auto &my_key_ptr = mapping->get("my_key");                                                                     \
         CHECK(my_key_ptr);                                                                                             \
-        auto &downcast = dynamic_cast<BindableOpaqueItem &>(*my_key_ptr);                                              \
+        auto &downcast = *downcast_bindable_item(my_key_ptr.get());                                                    \
         CHECK(downcast.has_orphan());                                                                                  \
-        OpaqueItemBuilder builder = msg_builder.initRoot<msgx::type::Item::Oneof>();                                   \
+        OpaqueItemBuilder builder = get_oneof_builder(msg);                                                            \
         downcast.build(builder);                                                                                       \
         CHECK_EQ(builder.which(), VALUE_TYPE);                                                                         \
         CHECK(CHECK_TRUE_STR);                                                                                         \
@@ -26,8 +24,8 @@ using Which = msgx::type::Item::Oneof::Which;
 
 TEST_CASE("Test storing primitive")
 {
-    OpaqueMapping mapping;
-    capnp::MallocMessageBuilder msg_builder;
+    MessageX msg;
+    auto mapping = msg.getLinkedItemPtr<OpaqueMapping>();
 
     DOCTEST_MSGX_PARAMETERIZED_PRIMITIVE(static_cast<unsigned char>('b'), getUChar, Which::U_CHAR);
     DOCTEST_MSGX_PARAMETERIZED_PRIMITIVE(static_cast<unsigned short>(1), getUShort, Which::U_SHORT);

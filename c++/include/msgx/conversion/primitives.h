@@ -42,8 +42,10 @@ struct conversion<std::string &>
     }
 };
 
-template <>
-struct conversion<const char *>
+template <typename T>
+struct conversion<T, typename std::enable_if_t<std::is_same<char *, T>::value ||     //
+                                               std::is_same<const char *, T>::value  //
+                                               >>
 {
     static constexpr bool directly_assignable = true;
 
