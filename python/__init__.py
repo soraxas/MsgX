@@ -1,2 +1,2 @@
 from ._version import __version__
-from .reciever import MsgXReceiver, spin_default
+from .receiver import MsgXReceiver, spin_default
