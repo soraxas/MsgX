@@ -90,8 +90,8 @@ constexpr auto get_device_specific_endian()
 
 /* Metaprogramming */
 
-template <class T>
-constexpr bool is_numeric_v = std::is_arithmetic<T>::value && !std::is_same<T, bool>::value;
+template <class T, class decayT = typename std::decay<T>::type>
+constexpr bool is_numeric_v = std::is_arithmetic<decayT>::value && !std::is_same<decayT, bool>::value;
 
 template <typename T>
 using enable_if_is_numeric_t = typename std::enable_if<is_numeric_v<T>, T>::type;

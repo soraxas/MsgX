@@ -37,14 +37,8 @@ endif ()
 option(BUILD_WITH_SPDLOG "Build with spdlog?" FALSE)
 
 if (BUILD_WITH_SPDLOG)
-#  cpmaddpackage("gh:gabime/spdlog@1.2.0")
+  cpmaddpackage("gh:soraxas/easyspdlog@0.0.1")
   add_compile_definitions(BUILD_WITH_EASYSPDLOG=1)
-
-#  if (BUILD_WITH_SPDLOG)
-    add_subdirectory(/home/tin/git-repos/easyspdlog easy_spdlog)
-#    set(PUBLIC_LINK_LIBRARIES ${PUBLIC_LINK_LIBRARIES} easyspdlog)
-    #  set(PUBLIC_LINK_LIBRARIES ${PUBLIC_LINK_LIBRARIES} spdlog::spdlog)
-#  endif()
 endif()
 
 

@@ -30,14 +30,19 @@ using is_iterable = decltype(detail::is_iterable_impl<T>(0));
 
 /////////////////////////////////////////////////////////
 
-template <typename DataType, template <typename, typename...> class ContainerType, typename... Args>
-struct conversion<ContainerType<DataType, Args...>,
-                  typename std::enable_if<!helpers::is_numeric_v<DataType>  // is not numeric
-                                              && is_iterable<ContainerType<DataType, Args...>>::value,
-                                          void>::type>
+template <typename ContainerType>
+struct conversion<ContainerType,
+                  typename std::enable_if<  //
+                      !helpers::is_numeric_v<
+                          // the following will resolve to the contained element type (through iterator interface)
+                          decltype(*std::begin(std::declval<ContainerType>()))>  // is not numeric
+                          && is_iterable<ContainerType>::value,
+                      void>::type>
 {
-    static void convert(msgx::OpaqueItemBuilder builder, const ContainerType<DataType, Args...> &values)
+    static void convert(msgx::OpaqueItemBuilder builder, const ContainerType &values)
     {
+        using DataType = typename std::decay<decltype(*std::begin(std::declval<ContainerType>()))>::type;
+
         auto anylist_builder = builder.initAnyList(values.size());
 
         size_t i = 0;
