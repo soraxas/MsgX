@@ -18,7 +18,6 @@ class MsgXReceiverMode(enum.Enum):
 
 class MsgXReceiverBase(ABC):
     default_callback: MsgXMessageCallBack
-    mode: MsgXReceiverMode
 
     def __init__(
         self,
@@ -41,15 +40,7 @@ class MsgXReceiverBase(ABC):
         )
 
     def initialise(self, sleep: float = 1):
-        mode = self.mode
-        if self.current_mode is mode:
-            return
-        self.current_mode = mode
-        socket = self.context.socket(zmq.SUB)
-        socket.connect(self.address)
-        socket.setsockopt_string(zmq.SUBSCRIBE, "")
-        self.socket = socket
-        time.sleep(sleep)
+        raise NotImplementedError()
 
     @abstractmethod
     def get_msg(self, flags: int) -> MsgXMessage:
@@ -79,8 +70,17 @@ class MsgXReceiverBase(ABC):
 class MsgXReceiver(MsgXReceiverBase):
     """A class that listen to message from cpp"""
 
-    mode: MsgXReceiverMode = MsgXReceiverMode.Synchronised
+    def initialise(self, sleep: float = 1):
+        if self.current_mode is MsgXReceiverMode.Synchronised:
+            return
+        self.current_mode = MsgXReceiverMode.Synchronised
+        socket = self.context.socket(zmq.SUB)
+        socket.connect(self.address)
+        socket.setsockopt_string(zmq.SUBSCRIBE, "")
+        self.socket = socket
+        time.sleep(sleep)
 
+    @property
     def context(self):
         return zmq.Context()
 

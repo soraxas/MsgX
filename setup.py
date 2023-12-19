@@ -47,7 +47,7 @@ setup(
     # telling setup.py that things within python/ is for package msgx
     package_dir={"msgx": "python"},
     # telling setup.py that msgx is a package that we want
-    packages=["msgx"],
+    packages=["msgx", "msgx.context_manager"],
     #
     install_requires=[
         "pyzmq>=25.0",
