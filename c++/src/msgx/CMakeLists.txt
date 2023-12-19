@@ -7,6 +7,7 @@ set(SOURCE_FILES
     opaque_item/bindable_item.c++
     opaque_item/item.c++
     opaque_item/mappings.c++
+    conversion/anylist_interface.c++
 )
 set(HEADER_FILES
     # cmake-format: sortable

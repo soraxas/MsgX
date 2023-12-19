@@ -8,21 +8,30 @@ namespace msgx
 namespace comms
 {
 
-Zmq::Zmq(size_t sleep_after_bind) : context_(), publisher_(context_, ZMQ_PUB)
+Zmq::Zmq(size_t sleep_after_bind) noexcept : context_(), publisher_(context_, ZMQ_PUB), degraded_(false)
 {
-    publisher_.bind(::msgx::comms::remote_address());
-    if (sleep_after_bind > 0)
-        std::this_thread::sleep_for(std::chrono::milliseconds(sleep_after_bind));
+    try
+    {
+        publisher_.bind(::msgx::comms::remote_address());
+
+        if (sleep_after_bind > 0)
+            std::this_thread::sleep_for(std::chrono::milliseconds(sleep_after_bind));
+    }
+    catch (const zmq::error_t &err)
+    {
+        std::cerr << "[MsgX] error when binding zmq: " << err.what() << std::endl;
+        degraded_ = true;
+    }
 }
 
-detail::BindedZmq &Zmq::get_instance()
+detail::BindedZmq *Zmq::get_instance()
 {
     static std::unique_ptr<detail::BindedZmq> instance_;
     if (!instance_ || instance_->binded_addr != ::msgx::comms::remote_address())
     {
         instance_ = std::make_unique<detail::BindedZmq>();
     }
-    return *instance_;
+    return instance_->degraded() ? nullptr : instance_.get();
 }
 
 void Zmq::send(capnp::MallocMessageBuilder &msg_builder)
@@ -46,7 +55,11 @@ void Zmq::send(capnp::MallocMessageBuilder &msg_builder)
 
 void Zmq::Send(capnp::MallocMessageBuilder &msg_builder)
 {
-    get_instance().zmq_instance.send(msg_builder);
+    auto instance = get_instance();
+    if (instance)
+    {
+        instance->zmq_instance.send(msg_builder);
+    }
 }
 
 }  // namespace comms

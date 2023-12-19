@@ -29,17 +29,24 @@ public:
     void operator=(const Zmq &) = delete;
 
 public:
-    static detail::BindedZmq &get_instance();
+    static detail::BindedZmq *get_instance();
 
     static void Send(capnp::MallocMessageBuilder &msg_builder);
 
     void send(capnp::MallocMessageBuilder &msg_builder);
 
+    bool degraded()
+    {
+        return degraded_;
+    }
+
 protected:
-    explicit Zmq(size_t sleep_after_bind = 1000);
+    explicit Zmq(size_t sleep_after_bind = 1000) noexcept;
 
     zmq::context_t context_;
     zmq::socket_t publisher_;
+
+    bool degraded_;
 
     friend detail::BindedZmq;
 };
@@ -52,6 +59,11 @@ struct BindedZmq
     explicit BindedZmq(Args... args)
       : zmq_instance(std::forward<Args>(args)...), binded_addr(::msgx::comms::remote_address())
     {
+    }
+
+    bool degraded()
+    {
+        return zmq_instance.degraded();
     }
 
     std::string binded_addr;

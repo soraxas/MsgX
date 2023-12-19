@@ -80,6 +80,13 @@ public:
         return std::move(msgx::AnyList(orphanage_getter_, std::forward<Args>(args)...));
     }
 
+    // alias easy function
+    template <typename... Args>
+    auto List(Args &&...args)
+    {
+        return std::move(msgx::AnyList(orphanage_getter_, std::forward<Args>(args)...));
+    }
+
     OrphanageGetter get_orphanage_getter() const;
 
 protected:

@@ -16,43 +16,43 @@ template <>
 constexpr auto NdListAdoptOrphanDispatcher<double_t>()
 {
     return &msgx::type::Item::Oneof::Builder::adoptDoubleList;
-};
+}
 
 template <>
 constexpr auto NdListAdoptOrphanDispatcher<float_t>()
 {
     return &msgx::type::Item::Oneof::Builder::adoptFloatList;
-};
+}
 
 template <>
 constexpr auto NdListAdoptOrphanDispatcher<int32_t>()
 {
     return &msgx::type::Item::Oneof::Builder::adoptIntList;
-};
+}
 
 template <>
 constexpr auto NdListAdoptOrphanDispatcher<int64_t>()
 {
     return &msgx::type::Item::Oneof::Builder::adoptLongList;
-};
+}
 
 template <>
 constexpr auto NdListAdoptOrphanDispatcher<bool>()
 {
     return &msgx::type::Item::Oneof::Builder::adoptBoolList;
-};
+}
 
 template <>
 constexpr auto NdListAdoptOrphanDispatcher<std::string>()
 {
     return &msgx::type::Item::Oneof::Builder::adoptStringList;
-};
+}
 
 template <>
 constexpr auto NdListAdoptOrphanDispatcher<msgx::type::Item>()
 {
     return &msgx::type::Item::Oneof::Builder::adoptAnyList;
-};
+}
 
 ////////////////////////////////////////////////////////////
 

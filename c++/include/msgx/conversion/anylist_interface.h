@@ -5,13 +5,15 @@
 
 namespace msgx
 {
+using OpaqueItemList = std::vector<OpaqueItemPtr>;
+
 namespace detail
 {
 
 template <typename T,
           typename std::enable_if<!std::is_same<T, std::unique_ptr<BindableOpaqueItem>>::value &&  //
                                   !std::is_same<T, std::unique_ptr<OpaqueMapping>>::value>::type * = nullptr>
-void _anylist_impl(const OrphanageGetter &orphanage_getter, std::vector<OpaqueItemPtr> &container, T arg)
+void _anylist_impl(const OrphanageGetter &orphanage_getter, OpaqueItemList &container, T arg)
 {
     auto ptr = std::make_unique<BindableOpaqueItem>(orphanage_getter);
     ::msgx::detail::call_conversion<typename std::decay<T>::type>(*ptr, std::move(arg));
@@ -20,15 +22,15 @@ void _anylist_impl(const OrphanageGetter &orphanage_getter, std::vector<OpaqueIt
 
 template <typename T, typename std::enable_if<std::is_same<T, std::unique_ptr<BindableOpaqueItem>>::value ||  //
                                               std::is_same<T, std::unique_ptr<OpaqueMapping>>::value>::type * = nullptr>
-void _anylist_impl(const OrphanageGetter &orphanage_getter, std::vector<OpaqueItemPtr> &container, T arg)
+void _anylist_impl(const OrphanageGetter &orphanage_getter, OpaqueItemList &container, T arg)
 {
+    (void)orphanage_getter;
     // directly pass-through opaque unique ptr
     container.push_back(std::move(arg));
 }
 
 template <typename T, typename... Args>
-void _anylist_impl(const OrphanageGetter &orphanage_getter, std::vector<OpaqueItemPtr> &container, T arg,
-                   Args &&...args)
+void _anylist_impl(const OrphanageGetter &orphanage_getter, OpaqueItemList &container, T arg, Args &&...args)
 {
     // process one
     _anylist_impl(orphanage_getter, container, std::forward<T>(arg));
@@ -38,25 +40,20 @@ void _anylist_impl(const OrphanageGetter &orphanage_getter, std::vector<OpaqueIt
 
 }  // namespace detail
 
+// build a any list from a list of opaque items
+OrphanOpaqueItem AnyList(OrphanageGetter orphanage_getter, OpaqueItemList &container);
+
 // alias easy function
-template <typename... Args>
-auto AnyList(OrphanageGetter orphanage_getter, Args &&...args)
+template <typename... Args,
+          typename std::enable_if<
+              // only enable if the first item in Args parameter pack is not already an OpaqueItemList
+              !std::is_same<std::tuple_element_t<0, std::tuple<Args...>>, OpaqueItemList>::value>::type * = nullptr>
+OrphanOpaqueItem AnyList(OrphanageGetter orphanage_getter, Args &&...args)
 {
-    std::vector<OpaqueItemPtr> container;
+    OpaqueItemList container;
     ::msgx::detail::_anylist_impl(orphanage_getter, container, std::forward<Args>(args)...);
 
-    auto item_orphan = orphanage_getter().newOrphan<msgx::type::Item::Oneof>();
-    auto anylist_builder = item_orphan.get().initAnyList(container.size());
-    //
-    for (size_t i = 0; i < container.size(); ++i)
-    {
-        auto orphan = orphanage_getter().newOrphan<msgx::type::Item>();
-
-        container[i]->build(orphan.get().initOneof());
-        anylist_builder.adoptWithCaveats(i, std::move(orphan));
-    }
-
-    return std::move(item_orphan);
+    return AnyList(orphanage_getter, container);
 }
 
 }  // namespace msgx

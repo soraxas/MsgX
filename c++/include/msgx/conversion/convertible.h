@@ -64,27 +64,14 @@ template <
     typename std::enable_if<!conversion_helper::is_directly_assignable<ConversionClass>::value, void>::type * = nullptr>
 void call_conversion(msgx::BindableOpaqueItem &opaque_item, T2 &&other)
 {
-    if (opaque_item.has_orphanage())
-    {
-        SPDLOG_TRACE("creating an orphan for datatype: {}", EASYSPDLOG_TYPE_NAME(T1));
-        auto builder = opaque_item.get_orphan_or_malloc_builder();
+    if (!opaque_item.has_orphanage())
+        throw std::runtime_error("call_conversion currently only support ptr with orphanage");
 
-        // construct it in-place right now to avoid copy
-        ::msgx::conversion<typename std::decay<T1>::type>::convert(builder, std::move(std::forward<T2>(other)));
-    }
-    else
-    {
-        if (!opaque_item.has_orphanage())
-            throw std::runtime_error("call_conversion currently only support ptr with orphanage");
+    SPDLOG_TRACE("creating an orphan for datatype: {}", EASYSPDLOG_TYPE_NAME(T1));
+    auto builder = opaque_item.get_orphan_or_malloc_builder();
 
-        //        SPDLOG_TRACE("no orphanage, copying datatype to callback: {}", typeid(T1).name());
-        //        // bind a lambda by copying value, and set it as callback
-        //        opaque_item.set_assignment_callback(    //
-        //            [other](OpaqueItemBuilder builder)  //
-        //            {                                   //
-        //                ::msgx::conversion<typename std::decay<T1>::type>::convert(builder, other);
-        //            });
-    }
+    // construct it in-place right now to avoid copy
+    ::msgx::conversion<typename std::decay<T1>::type>::convert(builder, std::move(std::forward<T2>(other)));
 }
 
 }  // namespace detail

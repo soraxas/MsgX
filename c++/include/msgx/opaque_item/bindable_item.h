@@ -17,7 +17,7 @@ public:
 
     void set_assignment_callback(std::function<void(OpaqueItemBuilder builder)> &&assign_primitive_callback);
 
-    void assign_orphan(capnp::Orphan<type::Item::Oneof> &&orphan);
+    void assign_orphan(OrphanOpaqueItem &&orphan);
 
     bool has_orphan() const
     {
@@ -25,7 +25,7 @@ public:
     }
 
 private:
-    capnp::Orphan<type::Item::Oneof> orphan_;
+    OrphanOpaqueItem orphan_;
 
     std::function<void(OpaqueItemBuilder builder)> assign_primitive_callback_;
 };

@@ -23,5 +23,6 @@ typedef unsigned char byte;
 
 using OrphanageGetter = std::function<capnp::Orphanage(void)>;
 using OpaqueItemBuilder = ::msgx::type::Item::Oneof::Builder;
+using OrphanOpaqueItem = capnp::Orphan<type::Item::Oneof>;
 
 }  // namespace msgx

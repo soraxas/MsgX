@@ -38,18 +38,18 @@ class KwargsIntermediate
 public:
     explicit KwargsIntermediate(std::string key);
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "misc-unconventional-assign-operator"
-    //    template <typename T>
-    //    Kwargs operator=(T &val)
-    //    {
-    //        using decay_T = typename std::decay<T>::type;
-    //        SPDLOG_DEBUG("[kwargs] assigning type [{}&] (decay: {}) via binding", EASYSPDLOG_TYPE_NAME(T),
-    //        EASYSPDLOG_TYPE_NAME(decay_T));
+    // #pragma clang diagnostic push
+    // #pragma ide diagnostic ignored "misc-unconventional-assign-operator"
+    //     template <typename T>
+    //     Kwargs operator=(T &val)
+    //     {
+    //         using decay_T = typename std::decay<T>::type;
+    //         SPDLOG_DEBUG("[kwargs] assigning type [{}&] (decay: {}) via binding", EASYSPDLOG_TYPE_NAME(T),
+    //         EASYSPDLOG_TYPE_NAME(decay_T));
     //
-    //        return Kwargs{key_, [val = std::forward<decay_T>(val)](msgx::BindableOpaqueItem &item)
-    //                      { ::msgx::detail::call_conversion<decay_T>(item, val); }};
-    //    }
+    //         return Kwargs{key_, [val = std::forward<decay_T>(val)](msgx::BindableOpaqueItem &item)
+    //                       { ::msgx::detail::call_conversion<decay_T>(item, val); }};
+    //     }
 
     template <typename T>
     Kwargs operator=(const T &val)
@@ -62,25 +62,19 @@ public:
                       { ::msgx::detail::call_conversion<decay_T>(item, val); }};
     }
 
-    template <typename T>
+    template <typename T, typename std::enable_if<std::is_trivially_copyable<T>::value>::type * = nullptr>
     Kwargs operator=(T &&val)
     {
         using decay_T = typename std::decay<T>::type;
         SPDLOG_DEBUG("[kwargs] assigning type [{}&&] (decay: {}) via move", EASYSPDLOG_TYPE_NAME(T),
                      EASYSPDLOG_TYPE_NAME(decay_T));
 
-        //        // move the non-copyable rvalue to a shared pointer
-        //        auto non_copyable = std::make_shared<decay_T>(std::forward<T>(val));
-        //
-        //        return Kwargs{key_, [val = std::move(non_copyable)](msgx::BindableOpaqueItem &item)
-        //                      { ::msgx::detail::call_conversion<decay_T>(item, std::move(*val)); }};
-
         return Kwargs{key_, [val = std::move(val)](msgx::BindableOpaqueItem &item)
                       { ::msgx::detail::call_conversion<decay_T>(item, std::move(val)); }};
     }
 
-    template <typename T>
-    Kwargs operator=(const T &&val)
+    template <typename T, typename std::enable_if<!std::is_trivially_copyable<T>::value>::type * = nullptr>
+    Kwargs operator=(T &&val)
     {
         using decay_T = typename std::decay<T>::type;
         SPDLOG_DEBUG("[kwargs] assigning type [const {}&&] (decay: {}) via move", EASYSPDLOG_TYPE_NAME(T),
@@ -98,7 +92,7 @@ public:
     {
         return operator=<std::initializer_list<T>>(other);
     }
-#pragma clang diagnostic pop
+    // #pragma clang diagnostic pop
 
 private:
     std::string key_;
