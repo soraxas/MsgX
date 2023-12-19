@@ -1,6 +1,7 @@
 #pragma once
 
 #include "msgx/conversion/convertible.h"
+#include "msgx/conversion/special.h"
 #include "msgx/opaque_item/mappings.h"
 
 namespace msgx
@@ -55,5 +56,71 @@ OrphanOpaqueItem AnyList(OrphanageGetter orphanage_getter, Args &&...args)
 
     return AnyList(orphanage_getter, container);
 }
+
+////////////////////////////////////
+
+// helper class that allows user to build anylist, dynamically
+class AnyListBuilderWrapper
+{
+public:
+    explicit AnyListBuilderWrapper(OrphanageGetter orphanage_getter) : orphanage_getter_(orphanage_getter)
+    {
+    }
+
+    // non-copyable
+    AnyListBuilderWrapper(const AnyListBuilderWrapper &) = delete;
+
+    AnyListBuilderWrapper &operator=(const AnyListBuilderWrapper &) = delete;
+
+    // move constructor
+    AnyListBuilderWrapper(AnyListBuilderWrapper &&other) noexcept
+      : orphanage_getter_(std::move(other.orphanage_getter_)), container_(std::move(other.container_))
+    {
+    }
+
+    template <typename... Args>
+    void add(Args &&...args)
+    {
+        // process all input
+        ::msgx::detail::_anylist_impl(orphanage_getter_, container_, std::forward<Args>(args)...);
+    }
+
+    size_t size() const
+    {
+        return container_.size();
+    }
+
+    OpaqueItemList &anylist_container()
+    {
+        return container_;
+    }
+
+    OrphanageGetter orphanage_getter()
+    {
+        return orphanage_getter_;
+    }
+
+private:
+    OrphanageGetter orphanage_getter_;
+    OpaqueItemList container_;
+};
+
+/////////////////////////////////////////////////////////
+
+template <>
+struct conversion<AnyListBuilderWrapper>
+{
+    static void convert(OpaqueItemBuilder builder, AnyListBuilderWrapper list_container)
+    {
+        auto anylist_builder = builder.initAnyList(list_container.size());
+
+        size_t i = 0;
+        for (auto &&val : list_container.anylist_container())
+        {
+            val->build(anylist_builder[i].initOneof());
+            ++i;
+        }
+    }
+};
 
 }  // namespace msgx

@@ -75,18 +75,19 @@ public:
 
     // alias easy function
     template <typename... Args>
-    auto AnyList(Args &&...args)
+    auto List(Args &&...args)
     {
-        return std::move(msgx::AnyList(orphanage_getter_, std::forward<Args>(args)...));
+        auto list_builder = AnyListBuilderWrapper{orphanage_getter_};
+        list_builder.add(std::forward<Args>(args)...);
+        return list_builder;
     }
 
     // alias easy function
     template <typename... Args>
-    auto List(Args &&...args)
+    auto AnyList(Args &&...args)
     {
-        return std::move(msgx::AnyList(orphanage_getter_, std::forward<Args>(args)...));
+        return List(std::forward<Args>(args)...);
     }
-
     OrphanageGetter get_orphanage_getter() const;
 
 protected:

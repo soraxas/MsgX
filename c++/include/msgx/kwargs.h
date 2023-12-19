@@ -74,10 +74,10 @@ public:
     }
 
     template <typename T, typename std::enable_if<!std::is_trivially_copyable<T>::value>::type * = nullptr>
-    Kwargs operator=(T &&val)
+    Kwargs operator=(T &val)
     {
         using decay_T = typename std::decay<T>::type;
-        SPDLOG_DEBUG("[kwargs] assigning type [const {}&&] (decay: {}) via move", EASYSPDLOG_TYPE_NAME(T),
+        SPDLOG_DEBUG("[kwargs] assigning type [const {}&] (decay: {}) via copy", EASYSPDLOG_TYPE_NAME(T),
                      EASYSPDLOG_TYPE_NAME(decay_T));
 
         // move the non-copyable rvalue to a shared pointer
@@ -85,6 +85,13 @@ public:
 
         return Kwargs{key_, [val = std::move(non_copyable)](msgx::BindableOpaqueItem &item)
                       { ::msgx::detail::call_conversion<decay_T>(item, std::move(*val)); }};
+    }
+
+    template <typename T, typename std::enable_if<!std::is_trivially_copyable<T>::value>::type * = nullptr>
+    Kwargs operator=(T &&val)
+    {
+        // delegate to the l-value version
+        return operator=(val);
     }
 
     template <typename T>
