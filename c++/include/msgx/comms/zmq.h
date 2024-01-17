@@ -2,9 +2,15 @@
 
 #include <memory>
 #include <thread>
-#include <zmq.hpp>
 
 #include "comms.h"
+
+// we forward declar zmq.hpp class here, so that we only need zmq.hpp as build dependency, not runtime.
+namespace zmq
+{
+class context_t;
+class socket_t;
+}  // namespace zmq
 
 namespace msgx
 {
@@ -43,8 +49,8 @@ public:
 protected:
     explicit Zmq(size_t sleep_after_bind = 1000) noexcept;
 
-    zmq::context_t context_;
-    zmq::socket_t publisher_;
+    std::unique_ptr<zmq::context_t> context_;
+    std::unique_ptr<zmq::socket_t> publisher_;
 
     bool degraded_;
 

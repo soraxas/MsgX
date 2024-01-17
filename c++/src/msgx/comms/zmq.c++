@@ -1,5 +1,6 @@
 #include "msgx/comms/zmq.h"
 
+#include <zmq.hpp>
 #include <iostream>
 
 namespace msgx
@@ -8,11 +9,13 @@ namespace msgx
 namespace comms
 {
 
-Zmq::Zmq(size_t sleep_after_bind) noexcept : context_(), publisher_(context_, ZMQ_PUB), degraded_(false)
+Zmq::Zmq(size_t sleep_after_bind) noexcept : degraded_(false)
 {
+    context_ = std::make_unique<zmq::context_t>();
+    publisher_ = std::make_unique<zmq::socket_t>(*context_, ZMQ_PUB);
     try
     {
-        publisher_.bind(::msgx::comms::remote_address());
+        publisher_->bind(::msgx::comms::remote_address());
 
         if (sleep_after_bind > 0)
             std::this_thread::sleep_for(std::chrono::milliseconds(sleep_after_bind));
@@ -50,7 +53,7 @@ void Zmq::send(capnp::MallocMessageBuilder &msg_builder)
     // the following will copy memory
     zmq::message_t zmq_msg{wordArray.begin(), wordArray.size() * sizeof(capnp::word)};
 
-    publisher_.send(zmq_msg, send_flags);
+    publisher_->send(zmq_msg, send_flags);
 }
 
 void Zmq::Send(capnp::MallocMessageBuilder &msg_builder)
