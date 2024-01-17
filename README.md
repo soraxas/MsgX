@@ -14,6 +14,15 @@ This can be used as a *publisher* and *subscriber* model between C++ and Python,
 
 You can include the project it as you normally. The following shows a snippet to quickly visualise your code using MsgX without much setup
 
+## Using CPM
+
+Using [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake) to auto-install MsgX:
+
+```cmake
+include(cmake/CPM.cmake)
+cpmaddpackage("gh:soraxas/msgx@1.0.5")
+```
+
 ## Quick and dirty out-of-tree build in cmake
 
 In your **CMakeLists.txt**:
