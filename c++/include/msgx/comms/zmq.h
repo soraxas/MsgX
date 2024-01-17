@@ -72,8 +72,8 @@ struct BindedZmq
         return zmq_instance.degraded();
     }
 
-    std::string binded_addr;
     Zmq zmq_instance;
+    std::string binded_addr;
 };
 }  // namespace detail
 
