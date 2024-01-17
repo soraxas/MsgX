@@ -20,6 +20,7 @@ set(HEADER_FILES
 set(PUBLIC_LINK_LIBRARIES CapnProto::capnp ${CAPNP_LIBRARIES} msgx_capnp zmq
                           ${ZMQ_LIBRARIES}
                           )
+set(PRIVATE_LINK_LIBRARIES cppzmq)
 
 if (BUILD_WITH_SPDLOG)
   set(PUBLIC_LINK_LIBRARIES ${PUBLIC_LINK_LIBRARIES} easyspdlog)
@@ -35,7 +36,8 @@ endif()
 # Build library
 add_library(msgx ${SOURCE_FILES} ${HEADER_FILES})
 target_link_libraries(msgx PUBLIC ${PUBLIC_LINK_LIBRARIES})
-target_link_libraries(msgx PRIVATE ${PUBLIC_LINK_LIBRARIES})
+target_link_libraries(msgx PRIVATE ${PRIVATE_LINK_LIBRARIES})
+
 
 target_include_directories(
   msgx PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
