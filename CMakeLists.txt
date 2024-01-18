@@ -33,11 +33,7 @@ if (NOT CapnProto_FOUND)
   set(CAPNPROTO_LIBRARIES CapnProto)
 endif ()
 
-find_package(cppzmq QUIET)
-if (NOT cppzmq_FOUND)
-  cpmaddpackage("gh:zeromq/cppzmq@4.10.0")
-endif ()
-
+cpmaddpackage("gh:zeromq/cppzmq@4.10.0")
 
 option(BUILD_WITH_SPDLOG "Build with spdlog?" FALSE)
 
