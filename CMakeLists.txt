@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.5.1)
-project(MsgX CXX)
+project(
+  MsgX
+  VERSION 1.0.8
+  LANGUAGES CXX
+  )
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -13,6 +17,11 @@ set(INSTALL_CMAKE_DIR ${CMAKE_INSTALL_PREFIX}/lib/cmake/msgx)
 # +-----------------------------------------------------------------------------
 option(BUILD_CTAGS "Build ctag file?" FALSE)
 option(BUILD_TESTS "Run Tests?" FALSE)
+
+# +-----------------------------------------------------------------------------
+# | Setup build
+# +-----------------------------------------------------------------------------
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # +-----------------------------------------------------------------------------
 # | Library search and setup
@@ -33,7 +42,12 @@ if (NOT CapnProto_FOUND)
   set(CAPNPROTO_LIBRARIES CapnProto)
 endif ()
 
-cpmaddpackage("gh:zeromq/cppzmq@4.10.0")
+find_package(cppzmq REQUIRED)
+if (NOT cppzmq_FOUND)
+  set(CPPZMQ_LIBRARIES CapnProto)
+  cpmaddpackage("gh:zeromq/cppzmq@4.10.0")
+endif ()
+
 
 option(BUILD_WITH_SPDLOG "Build with spdlog?" FALSE)
 

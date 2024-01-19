@@ -9,14 +9,10 @@ set(SOURCE_FILES
     opaque_item/mappings.c++
     conversion/anylist_interface.c++
 )
-set(HEADER_FILES
-    # cmake-format: sortable
-    ${CAPNP_HEADER}
-    ../../include/msgx/conversion/anylist_interface.h
-    ../../include/msgx/conversion/mapping_interface.h
-    ../../include/msgx/dispatcher/builder_adopt_dispatcher.h
-    ../../include/msgx/message.h
-)
+file(GLOB_RECURSE HEADER_FILES  ../../include/**/*.h )
+set(HEADER_FILES ${HEADER_FILES} ${CAPNP_HEADER})
+
+
 set(PUBLIC_LINK_LIBRARIES CapnProto::capnp ${CAPNP_LIBRARIES} msgx_capnp zmq
                           ${ZMQ_LIBRARIES}
                           )
@@ -41,14 +37,21 @@ target_link_libraries(msgx PRIVATE ${PRIVATE_LINK_LIBRARIES})
 
 target_include_directories(
   msgx PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-              $<INSTALL_INTERFACE:> <prefix>/include/msgx ../../include
+              # $<INSTALL_INTERFACE:> <prefix>/include/msgx ../../include
 )
 
 # Installation setup
-set_target_properties(
-  msgx PROPERTIES PUBLIC_HEADER "${HEADER_FILES}" #
-                  IMPORTED_LINK_DEPENDENT_LIBRARIES "${PUBLIC_LINK_LIBRARIES}"
+# set_target_properties(
+#   msgx PROPERTIES PUBLIC_HEADER "${HEADER_FILES}" #
+#                   IMPORTED_LINK_DEPENDENT_LIBRARIES "${PUBLIC_LINK_LIBRARIES}"
+# )
+
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../../include/"
+        DESTINATION "include"
+        FILES_MATCHING
+        PATTERN "*.h*"
 )
+
 
 install(
   TARGETS msgx
@@ -66,9 +69,21 @@ install(
   PATTERN "*.h" # select header files
 )
 
+
 # Add all targets to the build-tree export set
 export(
   TARGETS msgx
   APPEND
   FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake"
 )
+
+install(EXPORT ${PROJECT_NAME}Targets
+        FILE ${PROJECT_NAME}Targets.cmake
+        DESTINATION ${INSTALL_CMAKE_DIR})
+
+# install(
+#   FILES
+#     "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
+#   DESTINATION "${INSTALL_CMAKE_DIR}"
+#   COMPONENT dev
+# )
